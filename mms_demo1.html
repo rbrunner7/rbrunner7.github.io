@@ -1,0 +1,132 @@
+<html>
+<style>
+body {
+    background-color: #000000;
+}
+</style>
+<body>
+
+<pre>
+<font color="#FFFFFF">
+<font color="#C4A000"><b>[wallet 9scWH6]: </b></font>mms init 2/2 ./wallet1
+<font color="#C4A000"><b>[wallet 9scWH6]: </b></font>mms member two 9zPg4dxQiAbaaNu3xiaf3C7YJQHqGaEkfcEb6aPYWvyubUqmh1BHinHAiKusZeutjhW45uY1jQ4rY13d57xPCcHFHbzeaUv ./wallet2
+<font color="#C4A000"><b>[wallet 9scWH6]: </b></font>mms member
+Label                Monero Address
+                     Transport Address
+me                   9scWH6bTztL31EUrNFARcLdcrfQv647CPR97itSrBtvCCzdkahnRyyAeJGQSG1YFZC6WuTvN3hvnYe7nuoP2PuFjEdUx22y
+                     ./wallet1
+
+two                  9zPg4dxQiAbaaNu3xiaf3C7YJQHqGaEkfcEb6aPYWvyubUqmh1BHinHAiKusZeutjhW45uY1jQ4rY13d57xPCcHFHbzeaUv
+                     ./wallet2
+
+<font color="#C4A000"><b>[wallet 9scWH6]: </b></font>mms next
+prepare_multisig
+Wallet password: 
+MultisigV1eVjiVN5VgPWR9H6gLiR4jvgjvHTZkttwHVHdbAMt8MUF5MZfeFDYFHXH14zqCXMxNU4VMAhUQnNhVeYyVfjm7umzXDGtCkyK7eBDzGjbunPCdQfYbtbKysrEN2NHhV2NNfGGRs5DpBee9jsJUhEKoTxZsZXSzCwPGZgjZ1Z1x9ghQzPD
+Send this multisig info to all other participants, then use make_multisig &lt;threshold&gt; &lt;info1&gt; [&lt;info2&gt;...] with others&apos; multisig info
+This includes the PRIVATE view key, so needs to be disclosed only to that multisig wallet&apos;s participants 
+  Id In/Out Coalition Member                         Message Type               Height Message State            
+<font color="#4E9A06"><b>   1 out    two (./wallet2)                          key set                         0 ready to send            </b></font>
+Send these messages now? (Y/Yes/N/No): y
+<font color="#75507B"><b>MMS received new message</b></font>
+<font color="#C4A000"><b>[wallet 9scWH6]: </b></font>mms list
+  Id In/Out Coalition Member                         Message Type               Height Message State            
+<font color="#4E9A06">   1 out    two (./wallet2)                          key set                         0 sent                     </font>
+<font color="#75507B"><b>   2 in     two (./wallet2)                          key set                         0 waiting                  </b></font>
+<font color="#C4A000"><b>[wallet 9scWH6]: </b></font>mms next
+make_multisig
+Wallet password: 
+2/2 multisig address: 9vRBFgaQwR2B77nesba7jr8aFnmAqQp1MDi1EcWBh777a7WZEasSUkDTzXSiFTFdnrW8pBjW53wKibRhoKBUMEho6WHkFiR
+<font color="#C4A000"><b>[wallet 9vRBFg (out of sync)]: </b></font>refresh
+Starting refresh...
+<font color="#4E9A06">Refresh done, blocks received: 0</font>                                
+Currently selected account: [0] Primary account
+Tag: (No tag assigned)
+Balance: 0.000000000000, unlocked balance: 0.000000000000
+<font color="#4E9A06">Height 1120056, txid &lt;8f15e58897d56888e8be5c5e737e67d137905bb6797de18c4baa4c5842c5e5d8&gt;, 7.000000000000, idx 0/0</font>
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>status
+Refreshed 1120057/1120057, synced, daemon RPC v1.19
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>balance
+Currently selected account: [0] Primary account
+Tag: (No tag assigned)
+Balance: 7.000000000000, unlocked balance: 0.000000000000 (Some owned outputs have partial key images - import_multisig_info needed)
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms next
+export_multisig_info
+Multisig info exported to MMS
+  Id In/Out Coalition Member                         Message Type               Height Message State            
+<font color="#4E9A06"><b>   3 out    two (./wallet2)                          multisig sync data              1 ready to send            </b></font>
+Send these messages now? (Y/Yes/N/No): y
+<font color="#75507B"><b>MMS received new message</b></font>
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms next
+import_multisig_info
+<font color="#4E9A06">Height 1120056, txid &lt;8f15e58897d56888e8be5c5e737e67d137905bb6797de18c4baa4c5842c5e5d8&gt;, 7.000000000000, idx 0/0</font>
+Multisig info imported                                          
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>balance
+Currently selected account: [0] Primary account
+Tag: (No tag assigned)
+Balance: 7.000000000000, unlocked balance: 7.000000000000
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms transfer 9zo5QDV9YivQ8Fdygt7BNdGo1c98yfAWxAz6HMwsf15Vf1Gkme9pjQG2Typ9JnBKv5goziC2MT93o3YDUfoWdU9XUinX5kS 5
+
+Transaction 1/1:
+Spending from address index 0
+Sending 5.000000000000.  The transaction fee is 0.000904650000
+Is this okay?  (Y/Yes/N/No): y
+<font color="#4E9A06">Unsigned transaction(s) successfully written to MMS</font>
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms next
+send tx
+  Id In/Out Coalition Member                         Message Type               Height Message State            
+<font color="#4E9A06"><b>   6 out    two (./wallet2)                          partially signed tx             1 ready to send            </b></font>
+Send these messages now? (Y/Yes/N/No): y
+<font color="#75507B"><b>MMS received new message</b></font>
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms list
+  Id In/Out Coalition Member                         Message Type               Height Message State            
+<font color="#4E9A06">   1 out    two (./wallet2)                          key set                         0 sent                     </font>
+<font color="#75507B">   2 in     two (./wallet2)                          key set                         0 processed                </font>
+<font color="#4E9A06">   3 out    two (./wallet2)                          multisig sync data              1 sent                     </font>
+<font color="#75507B">   4 in     two (./wallet2)                          multisig sync data              1 processed                </font>
+<font color="#75507B">   5 in     me (./wallet1)                           partially signed tx             1 processed                </font>
+<font color="#4E9A06">   6 out    two (./wallet2)                          partially signed tx             1 sent                     </font>
+<font color="#75507B"><b>   7 in     two (./wallet2)                          fully signed tx                 1 waiting                  </b></font>
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms next
+Choose processing:
+1: Submit tx
+2: Send the tx for submission to two (./wallet2)
+Choice: 1
+submit_multisig
+Loaded 1 transactions, for 7.000000000000, fee 0.000904650000, sending 5.000000000000 to 9zo5QDV9YivQ8Fdygt7BNdGo1c98yfAWxAz6HMwsf15Vf1Gkme9pjQG2Typ9JnBKv5goziC2MT93o3YDUfoWdU9XUinX5kS, 1.999095350000 change to 9vRBFgaQwR2B77nesba7jr8aFnmAqQp1MDi1EcWBh777a7WZEasSUkDTzXSiFTFdnrW8pBjW53wKibRhoKBUMEho6WHkFiR, with min ring size 7, no payment ID. Is this okay? (Y/Yes/N/No): y
+<font color="#4E9A06">Transaction successfully submitted, transaction &lt;12b3f68f60fbc13c938ab78d456dcb689f3270f0935dda8f5288c1da2a4fd2c3&gt;</font>
+<font color="#4E9A06">You can check its status by using the `show_transfers` command.</font>
+<font color="#4E9A06">Height 1120071, txid &lt;12b3f68f60fbc13c938ab78d456dcb689f3270f0935dda8f5288c1da2a4fd2c3&gt;, 1.999095350000, idx 0/0</font>
+<font color="#75507B">Height 1120071, txid &lt;12b3f68f60fbc13c938ab78d456dcb689f3270f0935dda8f5288c1da2a4fd2c3&gt;, spent 7.000000000000, idx 0/0</font>
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms next
+export_multisig_info
+Multisig info exported to MMS
+  Id In/Out Coalition Member                         Message Type               Height Message State            
+<font color="#4E9A06"><b>   8 out    two (./wallet2)                          multisig sync data              2 ready to send            </b></font>
+Send these messages now? (Y/Yes/N/No): y
+<font color="#75507B"><b>MMS received new message</b></font>
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms next
+import_multisig_info
+<font color="#4E9A06">Height 1120071, txid &lt;12b3f68f60fbc13c938ab78d456dcb689f3270f0935dda8f5288c1da2a4fd2c3&gt;, 1.999095350000, idx 0/0</font>
+<font color="#75507B">Height 1120071, txid &lt;12b3f68f60fbc13c938ab78d456dcb689f3270f0935dda8f5288c1da2a4fd2c3&gt;, spent 7.000000000000, idx 0/0</font>
+Multisig info imported                                          
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>balance
+Currently selected account: [0] Primary account
+Tag: (No tag assigned)
+Balance: 1.999095350000, unlocked balance: 0.000000000000
+<font color="#C4A000"><b>[wallet 9vRBFg]: </b></font>mms list
+  Id In/Out Coalition Member                         Message Type               Height Message State            
+<font color="#4E9A06">   1 out    two (./wallet2)                          key set                         0 sent                     </font>
+<font color="#75507B">   2 in     two (./wallet2)                          key set                         0 processed                </font>
+<font color="#4E9A06">   3 out    two (./wallet2)                          multisig sync data              1 sent                     </font>
+<font color="#75507B">   4 in     two (./wallet2)                          multisig sync data              1 processed                </font>
+<font color="#75507B">   5 in     me (./wallet1)                           partially signed tx             1 processed                </font>
+<font color="#4E9A06">   6 out    two (./wallet2)                          partially signed tx             1 sent                     </font>
+<font color="#75507B">   7 in     two (./wallet2)                          fully signed tx                 1 processed                </font>
+<font color="#4E9A06">   8 out    two (./wallet2)                          multisig sync data              2 sent                     </font>
+<font color="#75507B">   9 in     two (./wallet2)                          multisig sync data              2 processed                </font>
+</pre>
+</font>
+</body>
+</html>
+
