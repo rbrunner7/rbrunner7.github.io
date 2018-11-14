@@ -1,0 +1,136 @@
+<html>
+<head>
+<title>MMS Implementation Information</title>
+<style type="text/css">
+<!--
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif}
+code {font-size:1.2em}
+-->
+</style>
+</head>
+<body>
+<h1 id="mmsimplementationinformation">MMS Implementation Information</h1>
+
+<h2 id="preface">Preface</h2>
+
+<p>This text explains the structure of the <em>MMS</em> (<em>Multisig Messaging System</em>) code on a high level and gives information about its architecture and design principles.</p>
+
+<p>It is meant for people who want to understand and review in depth the author's PR with the code (which has a considerable line count), for people who want to use the MMS for new clients beyond the CLI wallet, e.g. the GUI wallet, and for people who want to modify or extend the MMS itself.</p>
+
+<h2 id="generalmmsinformation">General MMS Information</h2>
+
+<p>It may help to understand the MMS code by knowing what it is meant for (making Monero multisig transactions easier) and how the MMS looks and feels when used in the CLI wallet. You can have a look at <a href="https://www.youtube.com/watch?v=UElJYkZYVBs">this video</a> on YouTube or at <a href="https://rbrunner7.github.io/mms_demo1">this texual log</a>; note however that both are somewhat out-of-date and should only be used to get a first impression.</p>
+
+<p>If you want to set up and configure MMS plus PyBitmessage to be able to use it yourself or even debug to understand the code better, you can consult <a href="https://taiga.getmonero.org/project/rbrunner7-really-simple-multisig-transactions/wiki/beta-manual">this beta manual</a>.</p>
+
+<p>The general MMS project site is <a href="https://taiga.getmonero.org/project/rbrunner7-really-simple-multisig-transactions/wiki/home">here</a> on Monero's Taiga website, but you won't find much information there about actual code and implementation.</p>
+
+<p>Before this PR for Monero the MMS was subjected to intensive beta testing. It was used to build literally dozens of multisig wallets and make a similar number of Monero Testnet and Wownero Testnet and Mainnet transactions. This faster and easier way of doing multisig allowed testing the Monero multisig code itself much better than before, and 3 different bugs in that code were uncovered using the MMS.</p>
+
+<h2 id="compatibility">Compatibility</h2>
+
+<p><code>wallet2</code> supports now, pre-MMS so to say, a number of calls to deal with multisig transactions, and produces and processes a number of related data formats, e.g. Base58-encoded textual strings starting with marks like <code>MultisigV1</code> or partially signed transactions as binary data. The CLI wallet implements a number of multisig-related commands like <code>prepare_multisig</code> and <code>export_multisig_info</code> that use those <code>wallet2</code> calls and output produced data to the console, write it to file, expect input data as command parameters or read it from file.</p>
+
+<p>You find those "manual" CLI wallet multisig workflows described e.g. <a href="https://taiga.getmonero.org/project/rbrunner7-really-simple-multisig-transactions/wiki/22-multisig-in-cli-wallet">here</a> and <a href="https://taiga.getmonero.org/project/rbrunner7-really-simple-multisig-transactions/wiki/23-multisig-in-cli-wallet">here</a>.</p>
+
+<p>The MMS does <strong>not</strong> change anything fundamental here, neither the multisig-related <code>wallet2</code> calls nor the content or structure of those multisig-related data packets. It is <strong>strictly an extension</strong> of all this. If you use the MMS you can decide to stop using it and rely on the existing CLI multisig command set as fallback. Likewise, you can prepare wallets for multisig "conventionally" and only later start to use the MMS to actually transact.</p>
+
+<p>If the code in the MMS PR did change anything in this respect that would probably be a bug.</p>
+
+<p>Because of this the MMS does <strong>not touch consensus</strong> in any way: No new ways to transact, no existing rules governing multisig transactions modified or relaxed, etc.  </p>
+
+<h2 id="mainparts">Main Parts</h2>
+
+<p>A first high-level overview of the main code parts of the MMS; each of them get a separate chapter with more details further down:</p>
+
+<ul>
+<li>A new class <code>message_store</code> that is the core of the MMS, as a kind of an API to interact with the MMS, send and receive messages and manage the list of stored messages</li>
+
+<li>A new class <code>message_transporter</code>, doing the actual sending and receiving of messages on behalf of a message store by calling PyBitmessage through its API</li>
+
+<li>Modifications in <code>wallet2</code>: Manage an additional per-wallet file with an extension of <code>.mms</code> that contains a serialized <code>message_store</code> object, and save the original Monero address plus original view secret key to the <code>.keys</code> file when "going multisig"</li>
+
+<li>Extensions in <code>simplewallet</code>: Implement a new <code>mms</code> command with a number of sub-commands and instrument a number of existing commands to be called by the MMS and give back results to it</li>
+</ul>
+
+<p>A <code>wallet2</code> objects now owns a <code>message_store</code> object that is active or inactive. The object is public and can be obtained by users like <code>simplewallet</code>. A <code>message_store</code> object in turn owns a strictly private <code>message_transporter</code> object.  </p>
+
+<h2 id="message_storethecoreofthemms"><code>message_store</code>: The Core of the MMS</h2>
+
+<p>The <code>message_store</code> class is the core of the MMS and contains almost all of the functionality. The MMS code in <code>simplewallet</code> is trivial to most extent and makes heavy use of <code>message_store</code> methods.</p>
+
+<p>With over 1300 lines of code <code>message_store.cpp</code> has a respectable size, but it's mostly simple and straight-forward code. As already explained in the <em>Compatibility</em> chapter there is no new multisig-related functionality here, no new "crypto" implemented, etc. It's mostly boring code that deals with the two types of data involved, messages as defined by the struct <code>mms::message</code> and coalition members as defined by struct <code>coalition_member</code>.</p>
+
+<p><code>message_store</code> does not decode, modify or re-encode any of the multisig-related data packets that <code>wallet2</code> produces and consumes; it just sends them around and stores them as <code>mms::message.content</code>. If anything will ever go wrong with such content the message store will not notice yet; only <code>wallet2</code> will complain later when attempting to actually process it.</p>
+
+<p>For transport message contents are encrypted using the wallet's view secret key.</p>
+
+<p>For reading and writing <code>.mms</code> files Boost portable binary serialization is used. Writing is a two-level process: First the <code>message_store</code> object is serialized, then this binary data encrypted and finally written to file by serializing a <code>mms::file_data</code> structure. It's quite similar to the two-level writing and encrypting of <code>.keys</code> files for wallets, only using binary serialization instead of JSON serialization for the first level.</p>
+
+<p>A proposal to use LMDB instead of binary serialization was not picked up by the MMS author, firstly because those .mms files are typically quite small (under 1 MB) and secondly because the author is not familiar with LMDB at all ...</p>
+
+<h2 id="message_transporterinterfacetopybitmessage"><code>message_transporter</code>: Interface to PyBitmessage</h2>
+
+<p>In principle the MMS is agnostic to the way the messages are actually transported between wallets. However currently using PyBitmessage is the only implemented way, over the Bitmessage network. No other Bitmessage protocol implementation than PyBitmessage is supported, and no effort was done to prepare the <code>message_transporter</code> class already now for using other messaging protocols in the future e.g. by offering some kind of interface, driver or plugin model.</p>
+
+<p>(In the opinion of the MMS author this is no oversight or "work still in progress": He deemed it not worth the bother now, with Kovri over the horizon that probably will be the prime candidate for message transport in Monero's future.) </p>
+
+<p>PyBitmessage offers an API. A description of this API is <a href="https://bitmessage.org/wiki/API_Reference">here</a> on the Bitmessage wiki website. PyBitmessage uses <em>XML-RPC</em> as described e.g. <a href="https://en.wikipedia.org/wiki/XML-RPC">here</a> in Wikipedia.</p>
+
+<p><code>message_transporter</code> calls this API to send messages, receive them, delete them, and create and delete single-use Bitmessage addresses for auto-config. It uses <code>epee::net_utils::http::http_simple_client</code> for actual communication.</p>
+
+<p>The class implements an absolutely minimalistic support for constructing and parsing XML, only what is strictly necessary to put together query XML strings and picking single results (or error messages) out of the returned result XML strings. (The current Monero code base seems to offer no support of XML yet, and taking in any XML library as a new dependency was deemed overkill.)</p>
+
+<p>Note that PyBitmessage does not use XML but JSON to give back complex results like arrays. <code>epee::serialization::load_t_from_json</code> is used to process such results.</p>
+
+<h2 id="modificationsinwallet2">Modifications in <code>wallet2</code></h2>
+
+<p>The <code>wallet2</code> class does not implement any direct MMS functionality; that's all in <code>message_store</code> "below" or in <code>simplewallet</code> "above", but there are some new mechanisms to support the MMS.</p>
+
+<h3 id="managingthemmsfile">Managing the <code>.mms</code> File</h3>
+
+<p>The MMS introduces a new per-wallet file with an extension of <code>.mms</code> that contains a serialized <code>message_store</code> object.</p>
+
+<p>The <code>wallet2</code> class was made aware of this additional file and now takes care of it for some operations. However, it knows nothing about its structure and treats it as a blackbox, and it does not matter whether the file is around or not.</p>
+
+<p>Nothing directly MMS-related is stored in any of the existing files that comprise a wallet: If you ever decide to stop using the MMS for a certain wallet or want to restart with a clean slate because something got messed up, simply delete the <code>.mms</code> file, and no <code>wallet2</code> or <code>simplewallet</code> code will know or care that it ever was there.</p>
+
+<h3 id="keepingoriginalmoneroaddressandviewsecretkey">Keeping "Original" Monero Address and View Secret Key</h3>
+
+<p>The MMS uses Monero addresses for addressing and view secret keys for message content encryption.</p>
+
+<p>When "going multisig" a Monero wallet changes its address from the "original" address that resulted from wallet creation to the new multisig address. Of course at the same time public and secret keys change as well.</p>
+
+<p>To make it possible to start using the MMS <strong>at any time</strong>, especially <strong>after</strong> a wallet already went multisig, as an extension, the original Monero address and the original view secret key are written into the <code>.keys</code> file immediately before the wallet overwrites them with new multisig-related information.</p>
+
+<p>That information can later be obtained for use by the MMS with the new <code>wallet2::get_multisig_wallet_state</code> method.</p>
+
+<p>(The author of the MMS deems the risk acceptable to keep the original view secret key around and keep it also im memory while doing MMS operations, because firstly it's not the spend key but only the view key, and secondly it has no use anymore anyway as soon as the wallet is multisig.)</p>
+
+<h3 id="providingwalletstateinformation">Providing Wallet State Information</h3>
+
+<p>Quite a number of <code>message_store</code> calls need information about the current state of the corresponding <code>wallet2</code> object like e.g. if multisig was already activated or not yet.</p>
+
+<p>To avoid circular imports <code>message_store</code> does not import anything from <code>wallet2</code> and is strictly "lower" in the hierarchy of classes. Because of this the following construct is used:</p>
+
+<p>The struct <code>mms::multisig_wallet_state</code> contains everything that a <code>message_store</code> ever needs to know about the state of a <code>wallet2</code> in any situation. The new public call <code>wallet2::get_multisig_wallet_state</code> gets that information. A number of <code>message_store</code> methods have the struct as their first parameter.</p>
+
+<p>So, in <code>simplewallet</code> you see a lot of methods that first get wallet state out of <code>wallet2</code> only to immediately afterwards feed it into a <code>message_store</code> method and then forget about it. (For a next call the wallet state might have changed already after all.)</p>
+
+<p>This is a somewhat clumsy but simple scheme that allows for a clean class hierarchy. (A first, much more "clever" system of letting <code>wallet2</code> implement a new <code>wallet_info_provider</code> interface and then have <code>message_store</code> call that itself on demand was dropped.)</p>
+
+<h2 id="modificationsinsimplewallet">Modifications in <code>simplewallet</code></h2>
+
+<p>The author of the MMS has tried to make the code changes for the MMS in <code>simplewallet</code> as transparent and as change-friendly into the future as possible. One measure to achieve that is the following:</p>
+
+<p>There is of course already quite an amount code in that class for multisig-related commands like the method <code>import_multisig</code> implementing the interactive <code>import_multisig_info</code> command. Taking that code and <strong>duplicating</strong> it to implement the MMS's multisig info import capability would result in a burden in the future whenever something multisig-related changes because one had to change it in <strong>two</strong> places.</p>
+
+<p>That's why the MMS uses a little trick to avoid that: It calls the <strong>same</strong> methods that implement those interactive commands, e.g. <code>import_multisig</code> by feeding them the right values in their <code>args</code> vector parameter, plus those methods are aware now that sometimes they are called because the user issued a command directly, and sometimes because the MMS has some work to do for them, and behave a little different as needed. (Check what those method do with the boolean value <code>by_mms</code>.)</p>
+
+<p>Another measure is not implementing a number of new commands for the MMS that would drive up the already considerable number of commands, and that would probably be hard to recognize as belonging together, but implementing a single <code>mms</code> command and work with "sub-commands". The names of the methods implementing those sub-commands all start with <code>mms_</code>.</p>
+
+<p>You may wonder why there is a quite big single continuous block (around 1000 lines) of new code for the MMS <strong>at the very end</strong> of <code>simplewallet.cpp</code>. The author of the MMS encountered problems with git when that block of new code was somewhere within the existing code: The display of changes done to the code came out as pretty much nonsense. The only way to solve the problem he could find was appending the code at the end.</p>
+
+<p>Check <a href="https://github.com/rbrunner7/monero/pull/2/files#diff-cb82e0aa6db499004305bf35f0eaafbcL8256">this attempt</a> where the new code is a single block towards the end, before the <code>main</code> method: Instead of showing a block of new code in front of <code>main</code> git mixes code from the MMS with existing <code>main</code> code in a way that does not make sense, and in any case does not allow easy code review.</p>
+</body>
+</html>
