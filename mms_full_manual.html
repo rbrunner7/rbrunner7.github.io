@@ -1,0 +1,936 @@
+<html>
+<head>
+<title>MMS User Manual</title>
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; width: 70em}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+<h1 id="mmsusermanual">MMS User Manual</h1>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>This manual describes the <em>Multisig Messaging System</em>, abbreviated as <em>MMS</em>. It's a system that aims to <strong>simplify multisig transactions</strong> for Monero and similar CrypoNote-based cryptocurrencies by making it easy to exchange info like key sets and sync data between wallets and by offering some "workflow support" guiding you through the various steps.</p>
+
+<p>The MMS so far presents itself to the user as a set of new commands in the CLI wallet. This is not surprising, as currently the CLI wallet is the only way to do multisig transactions interactively anyway. Hopefully this will be extended in the future; the MMS was designed with other wallets like e.g. the Monero GUI wallet in mind.</p>
+
+<p>This manual has some tutorial-like aspects and is intended to be read in sequential fashion, best without skipping any chapter before chapter <em>The Commands in Detail</em>.</p>
+
+<p>If you have high requirements regarding security and are not sure whether using the MMS is acceptable for you in the first place, you may read the chapter <em>Security</em> first.</p>
+
+<p>This first version of the manual was written around year-end 2018 by René Brunner (<em>rbrunner7</em>), the original author of the MMS.</p>
+
+<h2 id="moneromultisiginanutshell">Monero Multisig in a Nutshell</h2>
+
+<p>Probably it will be pretty hard to understand the MMS without at least a basic grasp of how Monero multisig transactions work in principle. Here a short overview together with info about the <em>terminology</em> that this manual uses; for more details and more <em>technical</em> explanations you will have to look elsewhere.</p>
+
+<p><em>Multisig</em> means that a transaction needs multiple signatures before it can be submitted to the Monero network and executed. Instead of one Monero wallet creating, signing, and submitting transactions all on its own, you will have a whole group of wallets and collaboration between them to transact.</p>
+
+<p>In this manual those wallets, or if you like the people controlling them, are called <em>authorized signers</em>. Depending on the type of multisig used, not <strong>all</strong> authorized signers need to sign before a transaction becomes valid, but only a subset of them. The corresponding number (which is equal or smaller than the number of authorized signers) is called <em>required signers</em>.</p>
+
+<p>The usual notation in use here is <em>M/N</em>, with <em>M</em> standing for the number of required signers, and <em>N</em> standing for the total number of authorized signers. For example, probably the most useful and most popular type of multisig is written as <em>2/3</em>: Out of a total of <strong>three</strong> authorized signers, any <strong>two</strong> are needed to make a transaction valid.</p>
+
+<p>For technically "simple" coins like Bitcoin and its forks doing multisig transactions consists of the following steps:</p>
+
+<ul>
+<li>Configure the multisig wallets and establish the multisig address</li>
+
+<li>Fund the multisig wallets / the multisig address so there is something to spend in the first place</li>
+
+<li>Do as many multisig transactions as you like</li>
+</ul>
+
+<p>Monero adds one more type of step, necessary for internal bookkeeping so to speak. Simply told all the mechanisms that make Monero transactions truly private complicate things and lead to a necessity to exchange information between wallets to enable them to correctly process transactions, both incoming and outgoing.</p>
+
+<p>The MMS uses the term <em>syncing</em> for the process to making wallets ready to transact again after sending or receiving transactions, and <em>multisig sync data</em> or simply <em>sync data</em> for the information that has to be exchanged to achieve that.</p>
+
+<p>So the steps for Monero multisig look like that:</p>
+
+<ul>
+<li>Configure the multisig wallets and establish the multisig address</li>
+
+<li>Fund the multisig wallets / the multisig address so there is something to spend in the first place</li>
+
+<li>Sync the wallets for a first time</li>
+
+<li>Do 1 multisig transaction</li>
+
+<li>Sync the wallets again</li>
+
+<li>Do another multisig transaction and/or receive more funds</li>
+
+<li>Sync the wallets yet again</li>
+
+<li>...</li>
+</ul>
+
+<p>The "value" of the MMS is making it easy and painless to exchange all those data packets between the wallets, and telling the signers at which point of the "workflow" they currently are and what has to be the next action in order to proceed.</p>
+
+<h2 id="thearchitectureofthemms">The Architecture of the MMS</h2>
+
+<p>The MMS basically has 3 parts:</p>
+
+<ul>
+<li>A set of new commands in the CLI wallet</li>
+
+<li>A running instance of PyBitmessage reachable from the computer running the CLI wallet, doing message transport on behalf of the wallet</li>
+
+<li>Internal code extensions to wallet code managing a new <code>.mms</code> file per wallet with the messages in it and interfacing with PyBitmessage</li>
+</ul>
+
+<p><a href="https://bitmessage.org/wiki/Main_Page">PyBitmessage</a> is currently the only supported program for message transport, the MMS won't "speak" to any other system. You can't use e-mail nor any other of the myriad of communication programs out there. If you don't like PyBitmessage or can't run it for any reason you won't be able to use the current version of the MMS.</p>
+
+<p>The author of the MMS hopes that you will give it a try: PyBitmessage is fully open source, is under continued development, has enough users to almost assure message transport at any time, and takes privacy very seriously - just like Monero.</p>
+
+<p>Hopefully a future MMS will build on Monero's "native" private communication system, <a href="https://getkovri.org/">Kovri</a>, but we are probably still quite some time away from a Kovri release ready for broad use.</p>
+
+<p>MMS communications should be <strong>safe</strong>: The Bitmessage system is considered safe as it's completely invisible who sends messages to whom, and all traffic is encrypted. For additional safety the MMS encrypts any message contents itself as well: Nobody except the receiver of an MMS message can decrypt and use its content, and the messages are signed, meaning the receiver can be sure they come from the right sender.</p>
+
+<h2 id="themmsuserexperience">The MMS User Experience</h2>
+
+<p>To see the "user experience" of multisig in the CLI wallet <strong>without</strong> MMS you can e.g. check <a href="https://taiga.getmonero.org/project/rbrunner7-really-simple-multisig-transactions/wiki/22-multisig-in-cli-wallet">here</a> and <a href="https://taiga.getmonero.org/project/rbrunner7-really-simple-multisig-transactions/wiki/23-multisig-in-cli-wallet">here</a>.</p>
+
+<p>Those pages are also useful to familiarize yourself with the steps for multisig transactions in general, as the MMS will not change the order of the steps or make any of them superfluous, but will just make execution considerably easier, and the MMS will be able to tell you the next step in order automatically in most cases.</p>
+
+<h3 id="amessagingsystem">A Messaging System</h3>
+
+<p>The general approach of the MMS is very <strong>similar to e-mail</strong>: You send messages around, with the MMS command set in the CLI wallet playing the part of your e-mail client, allowing you to send messages, receive messages and manage a list of stored messages, something like a combined inbox and outbox.</p>
+
+<p>The contents of those messages are of course all those things that must be transported between the wallets of the signers: key sets, wallet sync data, transactions to sign and/or submit to the network.</p>
+
+<p>PyBitmessage is used for the actual message transport and thus plays the part of your e-mail server. Once configuration is done sending and receiving messages is fully automatic i.e. needs no manual intervention.</p>
+
+<p>You don't use e-mail addresses, but Monero addresses to tell where messages should go, and you only ever send messages to other authorized signers: E.g. with 2/3 multisig you only have 2 partners to send something to.</p>
+
+<p>Like with e-mail people don't have to be online at the same time for message transport to work: PyBitmessage will keep messages for up to 2 days, giving you time to fetch them.</p>
+
+<p>The approach is in general quite flexbile and robust: If you need messages from several signers to proceed the MMS will wait until it finds all of them in the list of received messages, and the order of reception does not matter either, which results in a quite unstressed experience.</p>
+
+<p>If another signer tells you that a particular message did not arrive or was lost somehow you can send it again anytime, picking it from the message list, like you would re-send an e-mail in a similar situation.</p>
+
+<h3 id="signersandmessages">Signers and Messages</h3>
+
+<p>So, where a "normal" Monero wallet without MMS simply told manages three types of data (addresses, accounts and transactions), the MMS adds two more: Signers and messages.</p>
+
+<p>The MMS manages, for each multisig wallet separately, a list of <em>authorized signers</em>. With 2/3 multisig that list has <strong>three</strong> entries. On a technical level, each entry represents a Monero wallet containing keys that can be used to sign multisig transactions. On a conceptual level it's easier to imagine a group of 3 people, i.e. yourself and 2 partners, as those "authorized signers". (Often there will be indeed 3 distinct people controlling the 3 wallets, but not always of course.)</p>
+
+<p>The MMS also manages a single list of <em>messages</em> per wallet: All messages you send, plus all messages you receive. While the list of authorized signers is the same in all involved wallets, those messages of course differ. The more authorized signers there are to send you messages, and the longer you transact, the more messages will accumulate.</p>
+
+<h2 id="gettingthemms">Getting the MMS</h2>
+
+<p>Right now, at the time of writing this manual (year-end 2018), the MMS is only available as part of the latest Monero code (<code>master</code> branch on Monero's <a href="https://github.com/monero-project/monero">GitHub repository</a>). To use it, you have to check out that source code and compile it yourself. Doing so is easiest on a Linux system.</p>
+
+<p>With the next hardfork in Spring 2019 the MMS will become an integral standard part of the Monero software: You install Monero, you have it.</p>
+
+<p>A word of caution: At the time of writing using the latest development Monero version does not lead to conflicts and complications with any regular Monero release software and downloaded blockchain on the same system, but that may change between now and the hardfork, especially near the hardfork.</p>
+
+<h2 id="installingandconfiguringpybitmessage">Installing and Configuring PyBitmessage</h2>
+
+<p>Installing PyBitmessage is easy enough: You find links to downloads and install instructions from the <a href="https://bitmessage.org/wiki/Main_Page">Bitmessage Wiki homepage</a>. There are versions for all the major OS that Monero also supports: Linux, Windows, and macOS.</p>
+
+<p>After installing run it, configure a Bitmessage address for you and note it, as you will later need it to configure your multisig wallet.</p>
+
+<p>Don't worry right away if PyBitmessage does not seem to connect to the Bitmessage network when you run it the first time: Due to the decentral nature of that network it can take quite some time for your initial connect. It seems this often takes <strong>half an hour</strong>.</p>
+
+<p>Likewise sending the very first message to a brand-new Bitmessage address can take time because there is a key exchange involved, sometimes another half of an hour. Once the key exchange is done messages are typically delivered within a few minutes however, sometimes within seconds.</p>
+
+<p>You don't need to configure more than one Bitmessage address for you. You can run several multisig wallets over a <strong>single</strong> address without any problems because the MMS will be able to pick the right messages for the right wallets. You can even continue to use the same address for "normal" messages; those won't disturb the MMS, it will simply ignore any messages not intended for it.</p>
+
+<p>Out of the box your PyBitmessage installation is not yet ready for use with the MMS because it does not allow other programs to use its API per default, you have to enable this explicitely (which makes sense, of course, for security reasons).</p>
+
+<p>You find instructions how to <strong>enable the API</strong> on the <a href="https://bitmessage.org/wiki/API_Reference">Bitmessage wiki API reference page</a>. You will use the user name and the password you choose here later as command-line parameters for the CLI wallet so that the MMS will be able to log in to PyBitmessage.</p>
+
+<h2 id="furtherpybitmessagetweaks">Further PyBitmessage Tweaks</h2>
+
+<p>The current official release version 0.6.3.2 has a <a href="https://arxiv.org/abs/1805.11060">Dandelion++ protocol extension</a> built-in that hardens the network further against attacks that try to track message flow to find out who sends messages to whom. Unfortunately it seems that it has still a bug somewhere that can lead to wildly differing and very long message transmission times which is quite unfortunate when using the MMS.</p>
+
+<p>There is a way to switch off Dandelion++ which, in general, is not recommended of course, but useful for using the MMS as of now:</p>
+
+<ul>
+<li>Locate PyBitmessage's config file <code>keys.dat</code></li>
+
+<li>Make a new section there named <code>[network]</code></li>
+
+<li>Add the following line to this new section: <code>dandelion = 0</code></li>
+
+<li>Restart PyBitmessage</li>
+</ul>
+
+<p>As a "good citizen" you may consider to open your PC for access from other Bitmessage nodes to your node from the outside by opening port 8444. You find background info about that in their <a href="https://bitmessage.org/wiki/FAQ">FAQ</a>. It's not strictly necessary however for your client to function.</p>
+
+<h2 id="mmscommandoverview">MMS Command Overview</h2>
+
+<p>There is only <strong>one</strong> new command in the CLI wallet that gives access to the MMS, sensibly called <code>mms</code>. That command has however quite a number of subcommands to handle all the various functions of the MMS. Here a list of the commands; for details each command has its own chapter later in the manual:</p>
+
+<pre><code>init        Initialize and configure the MMS
+info        Display current MMS configuration
+signer      Define a signer by giving a single-word label, a transport address, and a Monero address, or list all defined signers
+list        List all messages
+next        Evaluate the next possible multisig-related action(s) according to wallet state, and execute or offer for choice
+sync        Force generation of multisig sync data regardless of wallet state, to recover from special situations like "stale data" errors
+transfer    Initiate transfer with MMS support; arguments identical to normal 'transfer' command arguments, for info see there
+delete      Delete a single message by giving its id, or delete all messages by using 'all'
+send        Send a single message by giving its id, or send all waiting messages
+receive     Check right away for new messages to receive
+note        Send a one-line note message to a signer, identified by its label, or show all unread notes
+show        Show detailed info about a single message
+export      Export the content of a message to file
+set         Set options, 'auto-send' being the only one so far
+
+start_auto_config   Start the auto-config process at the auto-config manager's wallet by creating new tokens
+auto_config         Start auto-config by using the token received from the auto-config manager
+stop_auto_config    Delete any tokens and abort an auto-config process
+send_signer_config  Send your complete signer configuration to all other signers
+</code></pre>
+
+<p>You get the list of commands by issuing <code>help mms</code>, and help for a particular subcommand by using <code>help mms &lt;subcommand&gt;</code>, e.g. <code>help mms next</code>. You can alternatively use <code>mms help &lt;subcommand&gt;</code> if that feels more natural.</p>
+
+<h2 id="configuringawalletforusewiththemms">Configuring a Wallet for Use with the MMS</h2>
+
+<h3 id="addressesandlabels">Addresses and Labels</h3>
+
+<p>First for better understanding some basic facts about addressing and referring to signers (or their wallets respectively) in the MMS:</p>
+
+<p>If you create a new wallet it gets (of course) its own, unique public Monero address. If you later configure the wallet for multisig, the wallet <strong>changes</strong> its public address to the common multisig address that you share with all the other authorized signers.</p>
+
+<p>The MMS uses the first, "original" public Monero address over the whole wallet lifetime for addressing, before <strong>and</strong> after "going multisig". It may be a little confusing that a wallet should have <strong>two</strong> public addresses somehow, but once you got the original address into your signer configuration you can more or less forget about it.</p>
+
+<p>The MMS uses <em>labels</em> that allow you to name yourself and the other signers, and that the MMS commands use when referring to signers. (Using Monero addresses or Bitmessage addresses in such commands would be quite cumbersome.)</p>
+
+<p>Labels must be one word, and they must be unique within a single wallet. The example later on in this manual uses the labels <code>alice</code> and <code>bob</code> for a case of 2/2 multisig.</p>
+
+<h3 id="runningcliwallet">Running CLI Wallet</h3>
+
+<p>When you start the CLI wallet for use with the MMS there are the following two new (optional) command line parameters for connecting to PyBitmessage:</p>
+
+<pre><code>--bitmessage-address    Use PyBitmessage instance at URL &lt;arg&gt;
+--bitmessage-login        Specify &lt;arg&gt; as username:password for PyBitmessage API
+</code></pre>
+
+<p>If you have PyBitmessage running on the same machine as the CLI wallet the default for the first parameter will do, and you should not need to set anything different. If it does not seem to find it despite running locally try to use <code>http://localhost</code> or <code>http://127.0.0.1</code> as argument for the first parameter.</p>
+
+<p>Beside that, you need of course either <code>--testnet</code> or <code>--stagenet</code> to connect to the right network. Also using <code>--log-level 0</code> could be useful: This instructs the wallet to write detailed info into its logfile that might help to find bugs or problems with the MMS.</p>
+
+<p>So a complete command line for the CLI wallet could look like this:</p>
+
+<pre><code>./monero-wallet-cli --testnet --bitmessage-login mmstest:p4ssw0rd --log-level 0
+</code></pre>
+
+<h3 id="initializingthemms">Initializing the MMS</h3>
+
+<p>After creating a new wallet you have to initialize it for use with the MMS; without that crucial first step you won't be able to use any MMS features. The command to do so is <code>mms init</code>:</p>
+
+<pre><code>mms init &lt;required_signers&gt;/&lt;authorized_signers&gt; &lt;own_label&gt; &lt;own_transport_address&gt;
+</code></pre>
+
+<p><code>own_transport_address</code> is the Bitmessage address that you configured in your own PyBitmessage program. A full <code>init</code> command could look like this:</p>
+
+<pre><code>mms init 2/2 alice BM-2cUVEbbb3H6ojddYQziK3RafJ5GPcFQv7e
+</code></pre>
+
+<p>Use that <code>init</code> command <strong>only once</strong>: Executing it a second time will completely re-initialize the MMS by deleting any signer info and any messages, which you don't want except in special circumstances.</p>
+
+<p>If you want to go through a MMS test as fast as possible you can instruct the wallet to ask for the password only when strictly necessary for technical reasons, and tell the MMS to send any generated message right away instead of prompting before doing so:</p>
+
+<pre><code>set ask-password 0
+mms set auto-send 1
+</code></pre>
+
+<p>(Both those settings are active during the 2/2 multisig example shown in this manual.)</p>
+
+<h3 id="configuringsigners">Configuring Signers</h3>
+
+<p>About each signer the MMS needs to know three things:</p>
+
+<ul>
+<li>The one-word <em>label</em> that you will use to refer to that signer</li>
+
+<li>The <em>transport address</em> which currently means their Bitmessage address as long as this is the only supported message transport system</li>
+
+<li>The <em>Monero address</em> i.e. the "original" Monero address of their wallet</li>
+</ul>
+
+<p>(See also above chapter <em>Addresses and Labels</em>.)</p>
+
+<p>You don't have to create signers; after the <code>mms init</code> command they are already all "there", although without any info yet with the exception of yourself. The commands for setting signer information refer to them by number, 1 up to the total number of authorized signers, so 1 and 2 in the following 2/2 multisig example with signers named <em>Alice</em> and <em>Bob</em> and thus with the labels <em>alice</em> and <em>bob</em>.</p>
+
+<p>After the above sample <code>init</code> command the list of signers looks like that:</p>
+
+<pre><code> # Label                Transport Address
+   Auto-Config Token    Monero Address
+ 1 alice                BM-2cUVEbbb3H6ojddYQziK3RafJ5GPcFQv7e
+                        A1VRwm8HT8CgA5bSULDZKggR9Enc9enhWHNJuDXDK4wDD6Rwha3W7UG5Wu3YGwARTXdPw1AvFSzoNPBdiKfpEYEQP1b5cCH
+
+ 2 &lt;not set&gt;            &lt;not set&gt;
+                        &lt;not set&gt;
+</code></pre>
+
+<p>Note that signer #1 is always "me" i.e. your own label, transport address and Monero address. So in Alice's signer list #1 will be Alice and #2 will be Bob, while in Bob's wallet it will be exactly the other way round.</p>
+
+<p>There are <strong>three ways</strong> to complete signer information: You can enter it manually, or you can use the auto-config mechanism that the MMS offers, which has a second, "semi-automatic" variant. With 2/2 there is hardly a difference in effort, but with higher numbers of signers auto-config is easier and more reliable. In any case, one advantage of auto-config is a secure transport of addresses because PyBitmessage is used.</p>
+
+<p>So pick <strong>one</strong> method from the three following chapters <em>Manually Configuring Signers</em>, <em>Auto-Config</em> and <em>Sending Signer Information</em>:</p>
+
+<h3 id="manuallyconfiguringsigners">Manually Configuring Signers</h3>
+
+<p>The command to manually enter signer info and display the list of signers is <code>mms signer</code>:</p>
+
+<pre><code>mms signer [&lt;number&gt; &lt;label&gt; [&lt;transport_address&gt; [&lt;monero_address&gt;]]]
+</code></pre>
+
+<p>Without any argument the command displays the list of signers. With at least a number and a label you can set or change info about a particular signer. A full command to set everything about signer #2 could look like this:</p>
+
+<pre><code>mms signer 2 bob BM-2cStcTfCx8D3McrMcmGZYZcF4csKcQT2pa 9yXKZ6UUdd8NnNN5UyK34oXV7zp7gjgZ4WTKHk8KzWsAAuyksfqoeRMLLkdWur85vnc1YL5E2rrMdPMHunA8WzUS9EL3Uoj
+</code></pre>
+
+<p>A command to later change only the label of signer #2 could be:</p>
+
+<pre><code>mms signer 2 bob-the-builder
+</code></pre>
+
+<p>With this manual method it's up to the signers <em>how</em> they all get to know each other's addresses.</p>
+
+<p>Be careful while entering signer information: Any mistakes like wrong Bitmessage addresses will probably make it impossible to correctly transact later on.</p>
+
+<p>Before you go out and start to exchange signer information over insecure channels like IRC or plain unencrypted e-mail, please note that there are certain dangers in doing so. If somebody can e.g. intercept your e-mails and get hold of your addresses that you send to a signer that person can then impersonate the signer.</p>
+
+<p>There is also the danger that in a 2/3 multisig scenario for <em>escrow</em> signer Bob can set up a second wallet for the trusted third-party Trent beside his own and trick Alice into sending everything to that wallet instead of Trent's. After this Bob will be able to transact alone and steal coins from Alice.</p>
+
+<p>You find a more detailed explanation of this second danger in chapter <em>Security</em> towards the end of the manual or <a href="https://taiga.getmonero.org/project/rbrunner7-really-simple-multisig-transactions/wiki/multisig-and-insecure-communication-channels">here</a>. Auto-config mitigates this danger to quite some extent.</p>
+
+<p>Alice's complete signer list looks like this:</p>
+
+<pre><code> # Label                Transport Address
+   Auto-Config Token    Monero Address
+ 1 alice                BM-2cUVEbbb3H6ojddYQziK3RafJ5GPcFQv7e
+                        A1VRwm8HT8CgA5bSULDZKggR9Enc9enhWHNJuDXDK4wDD6Rwha3W7UG5Wu3YGwARTXdPw1AvFSzoNPBdiKfpEYEQP1b5cCH
+
+ 2 bob                  BM-2cStcTfCx8D3McrMcmGZYZcF4csKcQT2pa
+                        9yXKZ6UUdd8NnNN5UyK34oXV7zp7gjgZ4WTKHk8KzWsAAuyksfqoeRMLLkdWur85vnc1YL5E2rrMdPMHunA8WzUS9EL3Uoj
+</code></pre>
+
+<h3 id="autoconfig">Auto-Config</h3>
+
+<p>MMS auto-config is based on so-called <em>auto-config tokens</em>. Such tokens are always 11 characters long, the fixed string "mms" followed by 8 hexadecimal digits. Examples for such tokens are <code>mms561832e3eb</code> and <code>mms62cb2b87e2</code>.</p>
+
+<p>The basic trick: Unlike Bitmessage addresses and Monero addresses those tokens are short enough to type them easily and e.g. use reasonably safe smartphone messenger apps or SMS to transmit them, or dictate them over the phone, again not perfectly safe, but still much safer than plain e-mail or IRC.</p>
+
+<p>The workflow is as follows - it's simpler than it looks at first sight, go once through it in practice and it makes sense:</p>
+
+<ul>
+<li>One signer takes on the job to lead and organize configuration, furthermore called <em>manager</em></li>
+
+<li>The manager assigns a label to each signer and enters all labels into the signer configuration, either using <code>mms signer</code> commands or giving them as arguments of the <code>mms start_auto_config</code> command in the next step</li>
+
+<li>The manager uses the command <code>mms start_auto_config</code> to generate auto-config tokens for all other signers, one distinct token per signer</li>
+
+<li>The manager transmits the tokens to their respective signers outside of the MMS</li>
+
+<li>All other signers enter their token with <code>mms auto_config &lt;token&gt;</code></li>
+
+<li>Their wallets will generate messages that send their addresses to the manager's wallet, already using PyBitmessage</li>
+
+<li>As soon as all those messages arrive there the manager can in turn send messages to all other signers containing the complete signer information by doing <code>mms next</code></li>
+
+<li>The other signers process those messages to complete their signer information with <code>mms next</code></li>
+</ul>
+
+<p>Several points are noteworthy here. Manual configuration with e.g. 5 signers could mean 5 times 4 = 20 initial manual information transfers, if each of the 5 signers sends addresses to 4 others. Even a more clever approach with someone collecting all addresses first and sending the complete list to all others then would take 4 plus 4 = 8 information transfers. With auto-config there are only <strong>4</strong> such manual transfers - 4 tokens from the manager out to the other signers; after that point it's already messages over PyBitmessage.</p>
+
+<p>You may wonder how the other signers' wallets can send their Bitmessage addresses back to the manager by using PyBitmessage. Doesn't this snake bite its own tail? The solution: A temporary, "throw-away" Bitmessage address is derived from each token and used just for this transfer, and temporary keys are derived as well for encrypting message content.</p>
+
+<p>Part of the increased safety of the auto-config process is the fact that each signer gets its own, distinct token. In 2/3 multisig, just make sure Bob cannot get hold of Trent's own token, and already Bob has no way to "play" Trent and set up a second wallet to be able to sign transactions all on his own.</p>
+
+<h3 id="sendingsignerconfiguration">Sending Signer Configuration</h3>
+
+<p>Beside full auto-config there is a second, alternative way to make configuration easier, based on a command called <code>send_signer_config</code>. It's less "automatic", but you may prefer it because it's more transparent what happens.</p>
+
+<p>Here the workflow is as follows:</p>
+
+<ul>
+<li>One signer takes on the job to lead and organize configuration, furthermore called <em>manager</em></li>
+
+<li>The manager receives from all other signers their addresses over channels outside the MMS, e.g. encrypted and signed e-mail</li>
+
+<li>The manager enters complete signer information into their wallet, using <code>mms member</code> commands</li>
+
+<li>The manager uses the <code>mms send_signer_config</code> command to send the completed information to all other signers</li>
+
+<li>The other signers process the messages containing signer information with <code>mms next</code></li>
+</ul>
+
+<p>For all signers except the manager this is nearly as comfortable as auto-config. Note however that the security of the scheme depends on securing the sending of info to the manager: If some signer can posit as not only themselves, but as other signers as well, they will be able to control several wallets and undermine the whole signing process. (See also chapter <em>Manually Configuring Signers</em> for more about such dangers.)</p>
+
+<h2 id="establishingthemultisigaddress">Establishing the Multisig Address</h2>
+
+<p>In general, there are no MMS commands to execute particular steps regarding multisig transactions (with the exception of starting a transfer using <code>mms transfer</code> and force sync with <code>mms sync</code>). You just use the <code>mms next</code> command, and the MMS will do whatever is next in the "multisig workflow", and if nothing is ready, e.g. because some messages are still missing, will tell you the reason why nothing is "next" yet.</p>
+
+<p>So, after you completed the info about all signers, either manually or through auto-config, you just issue a <code>mms next</code> command, and the MMS will start with the first step needed to establish the multisig address: Calculate <em>key sets</em> for all coalition members and set up messages to send those to them. The whole scene might look like this for Alice:</p>
+
+<pre><code>[wallet A1VRwm]: mms next
+prepare_multisig
+MultisigV18uEUr5L7EvFDqKWvbnK2ys395ddRPuG6zaxNTwbDq3WoUNJtkPUPbRAEQKBaCC52g5iJXi8XUF4aUP9984hdFrHsP1y3W8yQkm
+YUSDYXzouhzd479tMmpL4LJKUoW5e54bubEg5E4J3BZtJQiGNzvVsiBKGAKgT7J4bcNN66Xq7hpL4V
+Send this multisig info to all other participants, then use make_multisig &lt;threshold&gt; &lt;info1&gt; [&lt;info2&gt;...] with others' multisig info
+This includes the PRIVATE view key, so needs to be disclosed only to that multisig wallet's participants 
+  Id I/O  Authorized Signer              Message Type           Height   R Message State   Since                                   
+   1 out  bob: BM-2cStcTfCx8D3McrMcmGZ.. key set                     0   0 ready to send   2018-12-26 07:46:21, 1 seconds ago      
+Queued for sending.
+</code></pre>
+
+<p>The <code>prepare_multisig</code> output there is a hint that the MMS works by putting something like a "wrapper" about the CLI wallet <code>pepare_multisig</code> command, it even displays the <code>MultisigV1</code> string for confirmation. Now you don't have to send that manually to the other signer somehow: The MMS prepares a message for that and sends it in a fully automatic way.</p>
+
+<p>After Alice receives Bob's key set, another <code>mms next</code> command will process it and establish the multisig address:</p>
+
+<pre><code>[wallet A1VRwm]: mms next
+make_multisig
+Wallet password: 
+2/2 multisig address: 9uWY5Kq6XocGGqUByp22ty4HYxj4CfjCXdRrZ24EKvYW2U7fudSzCvTRRT35tMNx5heQfqKmVmFjahWUZ1BENnzH8UvyVF7
+</code></pre>
+
+<p>The wallet may be "out of sync" after this step; if yes, just do a quick <code>refresh</code>.</p>
+
+<p>In the case of non-symmetrical M/N multisig, with M different from N, like e.g. in 2/3, it's not enough that each signer sends one key set to every other signer: There will be several <em>rounds</em> of key set exchanges. However the MMS knows about this and will automatically take care of almost everything: For a particular wallet it waits until the key sets of all other signers have arrived before going on. If there is another key exchange round necessary, <code>mms next</code> will then start a new one. If not, the command will process the last key set(s) and establish the multisig address.</p>
+
+<p>It's possible that a future enhanced version of the MMS will do this in a fully automatic way, i.e. sending all necessary key sets around without further intervention until the multisig address is configured. For now however you have to push things along yourself by issuing <code>mms next</code> commands.</p>
+
+<h2 id="fundingthemultisigwallet">Funding the Multisig Wallet</h2>
+
+<p>With the multisig address established the wallet is now ready to receive funds. Here the MMS plays no role, nor does multisig in general: Just transfer some coins to the address, to have something to transfer out later, and wait until they arrive.</p>
+
+<h2 id="syncingwallets">Syncing Wallets</h2>
+
+<p>Every time after receiving or sending coins multisig wallets must exchange some info with each other to get "into sync" again. That's the case whenever the CLI wallet tells you about <em>partial key images</em> like in this <code>balance</code> command output:</p>
+
+<pre><code>[wallet 9uWY5K]: balance
+Currently selected account: [0] Primary account
+Tag: (No tag assigned)
+Balance: 7.000000000000, unlocked balance: 7.000000000000 (Some owned outputs have partial key images - import_multisig_info needed)
+</code></pre>
+
+<p>That "import<em>multisig</em>info needed" thing is perhaps the single most tiresome aspect of CryptoNote multisig transactions and quite some work e.g. in the case of 3/3 or 2/3 multisig where already a total of <strong>six</strong> pieces of information must be passed around each time, only to finalize reception of some coins and/or being able to transfer again after a transfer.</p>
+
+<p>At least, with the MMS, it's only a case of issuing <code>mms next</code> commands until all sync data is sent and received and the wallets get into sync again: It guides you automatically through the necessary <code>export_multisig_info</code> and <code>import_multisig_info</code> commands. Here again how Alice sees this:</p>
+
+<pre><code>[wallet 9uWY5K]: mms next
+export_multisig_info
+Multisig info exported to MMS
+  Id I/O  Authorized Signer              Message Type           Height   R Message State   Since                                   
+   5 out  bob: BM-2cStcTfCx8D3McrMcmGZ.. multisig sync data          1   0 ready to send   2018-12-26 08:58:14, 0 seconds ago      
+Queued for sending.
+MMS received new message
+  Id I/O  Authorized Signer              Message Type           Height   R Message State   Since                                   
+   6 in   bob: BM-2cStcTfCx8D3McrMcmGZ.. multisig sync data          1   0 waiting         2018-12-26 08:59:45, 0 seconds ago      
+[wallet 9uWY5K]: mms next
+import_multisig_info
+Height 1117984, txid &lt;b515082063a6242f1b62f21c80f95c90801f14ce3f48f51094d069e3580a78aa&gt;, 7.000000000000, idx 0/0
+Multisig info imported03
+</code></pre>
+
+<p>Don't worry if you receive such sync messages from other signers already before you are able to start sending yours: The MMS will handle this situation quite fine and send first, process afterwards.</p>
+
+<p>Check the chapter <em>Troubleshooting</em> if you ever get stuck somehow: E.g. there is a way to force sync even if <code>mms next</code> gets confused and thinks that syncing is not necessary or not possible. </p>
+
+<h2 id="makingmultisigtransactions">Making Multisig Transactions</h2>
+
+<p>For initiating multisig transactions there is the command <code>mms transfer</code> instead of the normal <code>transfer</code> command. The MMS variant supports all the parameter variations of the normal command; thus to get help use <code>help transfer</code>.</p>
+
+<p>The MMS does not care about subaddresses and accounts; whatever address you use for sending (and receiving) transactions, the MMS only cares about the data that the particular event creates, about the right moment to process that and about sending it to the right recipient(s).</p>
+
+<p>If you don't like your transaction data to become part of the <code>.mms</code> file in the form of stored message content, you can use the normal <code>transfer</code> command, but then it's of course your problem to send the partially signed transaction to the next signer.</p>
+
+<p>With multisig the <code>mms transfer</code> command does of course not yet transfer, but produces a partially-signed transaction instead. This stretches the concept of messages a bit because <code>mms transfer</code> produces a message to "me" i.e. the owner of the wallet itself, with the partially-signed transaction as content. Check message #7 below to Alice:</p>
+
+<pre><code>[wallet 9uWY5K]: mms transfer 9zo5QDV9YivQ8Fdygt7BNdGo1c98yfAWxAz6HMwsf15Vf1Gkme9pjQG2Typ9JnBKv5goziC2MT93o3YDUfoWdU9XUinX5kS 5
+No payment id is included with this transaction. Is this okay?  (Y/Yes/N/No): y
+
+Transaction 1/1:
+Spending from address index 0
+Sending 5.000000000000.  The transaction fee is 0.000094300000
+Is this okay?  (Y/Yes/N/No): y
+Unsigned transaction(s) successfully written to MMS
+[wallet 9uWY5K]: mms list
+  Id I/O  Authorized Signer              Message Type           Height   R Message State   Since                                   
+  ...
+   7 in   alice: BM-2cUVEbbb3H6ojddYQz.. partially signed tx         1   0 waiting         2018-12-26 09:10:42, 40 seconds ago     
+</code></pre>
+
+<p>The idea behind this: In this state, with the transaction waiting, and depending on the number of required signers, <code>mms next</code> will result in a question what to do with it: Especially in the case of 2/3 multisig, it's central to be able to decide <strong>where</strong> to send the transaction for the second signature that will make it valid, i.e. to <strong>which</strong> of the two possible signers.</p>
+
+<p>This could look like in this case of 2/4 multisig:</p>
+
+<pre><code>Unsigned transaction(s) successfully written to MMS
+[wallet 9vAbBk]: mms next
+Choose processing:
+1: Send the tx for signing to two: BM-2cUVEbbb3H6ojddYQziK3RafJ5GPcFQv7e
+2: Send the tx for signing to three: BM-2cStcTfCx8D3McrMcmGZYZcF4csKcQT2pa
+3: Send the tx for signing to four: BM-2cUjNoSxPkUY7ho4sPcEA6Rr26jqcasKiE
+</code></pre>
+
+<p>In the case of the 2/2 multisig example in this manual, there is no choice however: The transaction started by Alice has to go to Bob as the only other authorized and required signer:</p>
+
+<pre><code>[wallet 9uWY5K]: mms next
+Send tx
+  Id I/O  Authorized Signer              Message Type           Height   R Message State   Since                                   
+   8 out  bob: BM-2cStcTfCx8D3McrMcmGZ.. partially signed tx         1   0 ready to send   2018-12-26 09:29:30, 0 seconds ago      
+Queued for sending.
+</code></pre>
+
+<p>After receiving Bob signs, as usual not with a dedicated signing command that does not exist, but by simply using <code>mms next</code>:</p>
+
+<pre><code>[wallet 9uWY5K]: mms next
+sign_multisig
+Loaded 1 transactions, for 7.000000000000, fee 0.000094300000, sending 5.000000000000 to
+ 9zo5QDV9YivQ8Fdygt7BNdGo1c98yfAWxAz6HMwsf15Vf1Gkme9pjQG2Typ9JnBKv5goziC2MT93o3YDUfoWdU9XUinX5kS, 1.999905700000 change to
+ 9uWY5Kq6XocGGqUByp22ty4HYxj4CfjCXdRrZ24EKvYW2U7fudSzCvTRRT35tMNx5heQfqKmVmFjahWUZ1BENnzH8UvyVF7, with min ring size 11,
+ no payment ID. Is this okay? (Y/Yes/N/No): y
+Transaction successfully signed to file MMS, txid c1f603a9045f28b28f221eddf55be41e95f2ac7213384a32d35cadc0a8be3026
+It may be relayed to the network with submit_multisig
+</code></pre>
+
+<p>Yet another <code>mms next</code> does result in a choice for Bob, because he can either submit the transaction to the network himself, <strong>or</strong> send it back to Alice for doing so:</p>
+
+<pre><code>[wallet 9uWY5K]: mms next
+Choose processing:
+1: Submit tx
+2: Send the tx for submission to alice: BM-2cUVEbbb3H6ojddYQziK3RafJ5GPcFQv7e
+Choice: 
+</code></pre>
+
+<p>As already mentioned elsewhere after the transaction is submitted to the network and processed you have to sync the wallets before you can do another transfer. Also note that regardless of any syncing needs it's a restriction of Monero multisig that you must do <strong>strictly one transaction after the other</strong>. For example you can't put away fully-signed transactions for submitting them later and already start a new one to submit that first. (For some such scenarious the MMS is not smart enough to prevent you from trying; see chapter <em>Troubleshooting</em> about how you can recover by deleting messages containing unprocessable transactions and forcing sync.)</p>
+
+<p>As already mentioned you can keep out your transaction data out of the <code>.mms</code> file in the form of stored message content and use the normal <code>transfer</code> command, but then it's of course your problem to send the partially signed transaction to the next signer. Note also that the MMS does not support cold signing; that would be another reason to directly use <code>transfer</code> instead of <code>mms transfer</code>. You can, however, export transaction data contained in a message with the <code>mms export</code> command.</p>
+
+<h2 id="thecommandsindetail">The Commands in Detail</h2>
+
+<h3 id="mmsinit">mms init</h3>
+
+<pre><code>mms init &lt;required_signers&gt;/&lt;authorized_signers&gt; &lt;own_label&gt; &lt;own_transport_address&gt;
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>mms init 2/2 alice 2cUVEbbb3H6ojddYQziK3RafJ5GPcFQv7e
+</code></pre>
+
+<p>Prepare a wallet for use with the MMS. You can later change your own label and your own transport address using <code>mms signer</code>, but the two numbers, required signers and authorized signers, cannot be changed without issuing <code>mms init</code> again which will erase all signer information and all messages. The command will lead to the creation of an additional file with an extension of <code>.mms</code> for the wallet.</p>
+
+<p>For wallets created in "pre-MMS times" (before the MMS code was included in Monero) it's only possible to initialize the MMS if the wallet is not yet multisig. For wallets created with Monero code already present it's possible to initialize even with the wallet multisig already: When the wallet switched to multisig the "original" Monero address needed by the MMS was saved before it got replaced by the common multisig address.</p>
+
+<p>There is no command to deactivate the MMS. If you no longer want to use it for a particular wallet, just delete the <code>.mms</code> file or at least move it out of the way.</p>
+
+<h3 id="mmsinfo">mms info</h3>
+
+<pre><code>mms [info]
+</code></pre>
+
+<p>Display whether the MMS is active or not, and if yes, show the number of required signers and number of authorized signers. This is the only MMS command allowed with the MMS inactive.</p>
+
+<h3 id="mmssigner">mms signer</h3>
+
+<pre><code>mms signer [&lt;number&gt; &lt;label&gt; [&lt;transport_address&gt; [&lt;monero_address&gt;]]]
+</code></pre>
+
+<p>Examples:</p>
+
+<pre><code>mms signer
+mms signer 2 bob BM-2cStcTfCx8D3McrMcmGZYZcF4csKcQT2pa 9yXKZ6UUdd8NnNN5UyK34oXV7zp7gjgZ4WTKHk8KzWsAAuyksfqoeRMLLkdWur85vnc1YL5E2rrMdPMHunA8WzUS9EL3Uoj
+mms signer 2 bob-the-builder
+</code></pre>
+
+<p>Without argument, show the list of signers and their info, as far as known. Things never set and therefore still unknown are displayed as <code>&lt;not set&gt;</code>. Note that you don't have to and can't create signers: After <code>mms init</code> they already all "exist", although without any information set, with the exception of signer #1 which is always "me" i.e. the current wallet itself. Their number is fixed, it's the number of authorized signers as specified with <code>mms init</code>.</p>
+
+<p>With at least a number and a label as argument, set information about a signer, or change any information already set. You can always freely change labels and transport addresses, but for technical reasons Monero addresses can only be changed as long as there are no messages. In the worst case do <code>mms init</code> again and start from scratch.</p>
+
+<p>Numbers start with 1 and go up to the number of authorized signers.</p>
+
+<p>A <em>label</em> must be a single word. Use characters like minus "-" or underscore "_" to write more complex labels like e.g. <code>alice_in_wonderland</code>. Labels must be unique for all signers. There is no fixed maximal length for labels but some output will look strange or become hard to read with very long labels.</p>
+
+<p>A <em>transport address</em> can currently only be a Bitmessage address like e.g. <code>BM-2cStcTfCx8D3McrMcmGZYZcF4csKcQT2pa</code>, PyBitmessage being the only supported program for actual message transport. Transport addresses are not checked for syntax or validity by the MMS; if you enter a malformed address you will get an error message from PyBitmessage only later at first (attempted) use.</p>
+
+<p>If you enter a wrong address i.e. not the correct address for the respective signer most probably nothing will happen, the messages will just not reach the intended recipient; if nobody holds the key for that address, with a Bitmessage client configured to receive messages to it, the message will just "float around" the Bitmessage network for a while and finally expire.</p>
+
+<h3 id="mmslist">mms list</h3>
+
+<pre><code>mms list
+</code></pre>
+
+<p>List all stored messages. There are no separate inbox and outbox; all messages are contained in a single chronological list. The columns in detail:</p>
+
+<ul>
+<li><code>Id</code>: The unique id of the message that you can use to refer to the message in commands like <code>mms show</code> and <code>mms send</code>. Message ids count strictly upwards from 1. Ids of deleted messages won't get "recycled".</li>
+
+<li><code>I/O</code>: Message direction. <code>in</code> denotes a message that you received, <code>out</code> a message that you sent. Note than for some message types you can receive a message from yourself, e.g. a partially signed transaction that you started yourself.</li>
+
+<li><code>Authorized Signer</code>: In case of a received message, the sender, in case of a sent message, the recipient. Listed are the label and, within the width limit of the column, the transport address of the signer.</li>
+
+<li><code>Message Type</code>: The type of the message telling what kind of data it contains. For a complete list of possible message types see below.</li>
+
+<li><code>Height</code>: The number of transfers contained in the wallet at the time of message construction or reception. Used to group the "right" sync data messages which all must be from the same "height" for all other signers before sync can be successful. This height is unimportant for you except in cases where something went wrong; for more see chapter <em>Troubleshooting</em>.</li>
+
+<li><code>R</code>: The number of the key exchange round a key set belongs to, if the type of multisig requires more than one round in the first place, like e.g. 2/3. 0 for all other message types.</li>
+
+<li><code>Message State</code>: The current state of the message. <code>waiting</code> or <code>sent</code> for outgoing messages, <code>waiting</code> or <code>processed</code> for incoming messages. You can't directly change this state, it's always the result of the execution of commands.</li>
+
+<li><code>Since</code>: Point in time and time span since the message got its current message state. Times are in UTC, not local time. If you re-send a message, this timestamp is not adjusted and continues to display the time of the first sending.</li>
+</ul>
+
+<p>The complete list of message types:</p>
+
+<ul>
+<li><code>key_set</code>: Data about keys that wallets must exchange with each other for establishing multisig addresses</li>
+
+<li><code>additional_key_set</code>: A key set for an additional key exchange round, after the original one, as necessary for non-symmetric multisig types like e.g. 2/3</li>
+
+<li><code>multisig_sync_data</code>: Data that wallets must exchange with each other to correctly and completely interpret incoming and outgoing transactions; see also chapter <em>Syncing Wallets</em></li>
+
+<li><code>partially_signed_tx</code>: A transaction that has not yet the necessary number of signatures (= number of required signers) to commit it</li>
+
+<li><code>fully_signed_tx</code>: A transaction with a full set of required signatures, ready for submission to the Monero network; any signer could submit this</li>
+
+<li><code>note</code>: A message containing a note; see command <code>mms note</code></li>
+
+<li><code>signer_config</code>: Full information about all signers, to be sent as part of an auto-config process or as a result of a <code>mms send_signer_config</code> command</li>
+
+<li><code>auto_config_data</code>: Address data from a signer to send back to the auto-config manager after entering a token with <code>mms auto_config</code></li>
+</ul>
+
+<h3 id="mmsnext">mms next</h3>
+
+<pre><code>mms next [sync]
+</code></pre>
+
+<p><em>The</em> central and probably most useful command of the MMS: Check the state of the wallet plus the received and sent messages and their message state, and decide which action is the next one to execute, and then actually execute it.</p>
+
+<p>When in doubt, just issue a <code>mms next</code> command; the MMS will either execute the proper next command according to Monero's "multisig workflow rules", or tell you what it's waiting for before it can proceed. For "dangerous" things you can count on confirming prompts before the real action happens. Worst case a <code>mms next</code> can execute something earlier than you might have intended, but otherwise can hardly do any harm. </p>
+
+<p>Note how for many actions there is <strong>no</strong> dedicated command, and <code>mms next</code> the <strong>only</strong> way to move things forward. Don't look e.g. for commands to selectively process certain messages: If it's time to process some received messages in state <em>waiting</em>, the command will do so.</p>
+
+<p>Interestingly and maybe surprisingly, in Monero it's <strong>always</strong> clear what has to happen next regarding multisig, except in the case of partially signed transactions where you can decide <strong>which</strong> signer sending them to, and in the case of fully signed transactions that you can submit yourself to the network or send them to another signer for submission by them.</p>
+
+<p>The special command form <code>mms next sync</code> is for cases where sync data is waiting that the MMS on its own would not process because it "thinks" the wallet is in a state needing no new sync - which might be wrong. More about this in chapter <em>Troubleshooting</em>.</p>
+
+<h3 id="mmssync">mms sync</h3>
+
+<pre><code>mms sync
+</code></pre>
+
+<p>Manually start a round of syncing forcibly i.e. even if the MMS is of the opinion that no exchange of sync data is currently necessary. More about this in chapter <em>Troubleshooting</em>.</p>
+
+<h3 id="mmstransfer">mms transfer</h3>
+
+<pre><code>mms transfer &lt;transfer_command_arguments&gt;
+</code></pre>
+
+<p>Start a transfer under the control of the MMS, the difference to the standard <code>transfer</code> command being that the resulting partially signed transaction won't be written to a file that you have to handle further yourself, but that a message containing the transaction will result. Use <code>mms next</code> after <code>mms transfer</code> to ask the MMS to actually process the message which in effect means deciding which signer send it to for the next signature and create another message for that.</p>
+
+<p>The arguments of the <code>mms transfer</code> command are exactly the same of those of the standard <code>transfer</code> command. Check the info about that command with <code>help transfer</code> to learn about all the various possible parameters and parameter combinations.</p>
+
+<p>Note that quite in general the MMS does not care about addresses, subaddresses and acccounts. Regardless of what you specify in this regard for a <code>mms transfer</code> command afterwards there will always be a single new message containing the partially signed transaction.</p>
+
+<p>Even with MMS active you can still use the standard <code>transfer</code> command; you are then simply on your own regarding handling the transaction. Try to use the right command variant; <code>transfer</code> won't ask for confirmation whether you really intend to use it instead of <code>mms transfer</code>. If you issued <code>transfer</code> but really wanted the MMS variant, ignore the written transaction file and simply go on with <code>mms transfer</code>.</p>
+
+<p>The MMS does not, or at least not yet, keep track how many signatures a transaction actually has and who signed already and who not yet. Because of this weakness it can include choices that do not make sense, e.g. a choice to send a partially signed transaction to somebody who signed already.</p>
+
+<p>This hardly matters with multisig types like 2/2 or 2/3, but of course the higher the number of authorized signers, the more acute this can become. Some attention by the signers is needed to do the right thing. You can't go wrong in an absolute sense however: The CLI wallet, or more exactly the CLI commands called internally by the MMS, will reject any attempts to do invalid actions.</p>
+
+<h3 id="mmsdelete">mms delete</h3>
+
+<pre><code>mms delete (&lt;message_id&gt; | all)
+</code></pre>
+
+<p>Delete a single message given its message id, or delete all messages by using the <code>all</code> parameter. Single messages will be deleted without confirmation even if not yet sent or not yet processed. A deleted message is gone for good, there is no undo, and it's gone from PyBitmessage's store as well. (If you loose a message you can ask the sender to re-send it to you.)</p>
+
+<p>There are situations where you have to clear by deleting messages that did not get processed, got unprocessable and now "disturb the workflow"; more see chapter <em>Troubleshooting</em>. Deleting is also useful when somebody re-sends you a message and the original message finally reaches you as well later on.</p>
+
+<p>You could say that the value of a sent or processed message itself is not very high as in most cases you won't ever need it again, and for many messages there are no commands to process them again on demand anyway. But of course the list of messages itself can be quite valuable to see what happened, and when, so better not delete messages without a good reason.</p>
+
+<h3 id="mmssend">mms send</h3>
+
+<pre><code>mms send [&lt;message_id&gt;]
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>mms send 14
+</code></pre>
+
+<p>Without parameter send any messages in status <em>ready to send</em>. With a message id as parameter send or re-send that particular message. To be able to re-send a message is part of the "messaging system UX" and makes for a quite robust processing because there are very few situations that you can't recover from: The Bitmessage network ate your message? No problem, re-send. PyBitmessage crashed? No problem, restart PyBitmessage and re-send your message.</p>
+
+<p>Whether messages are immediately sent or whether the MMS asks for confirmation to do so first depends on the value of the <code>auto-send</code> parameter; see <code>mms set</code> command. Getting each message to send presented that way may be useful for beginners because it's clearer to see what happens; on the other hand it hardly ever makes sense to postpone sending because something else has to be sent first.</p>
+
+<p>"Sending" does not mean really send; the MMS just submits the message to PyBitmessage and <em>that</em> program will actually send. The MMS cannot give any feedback whether a message is still waiting to go out to the Bitmessage network or went out already. When in doubt, check in PyBitmessage itself.</p>
+
+<p>Any mistakes in Bitmessage addresses will only be detected at the moment of sending; the MMS itself does not check those addresses.</p>
+
+<h3 id="mmsreceive">mms receive</h3>
+
+<pre><code>mms receive
+</code></pre>
+
+<p>Force an immediate check for received messages, or more exactly force an immediate query of the MMS to PyBitmessage whether there are any new messages.</p>
+
+<p>The MMS checks for new incoming messages with the same frequence the CLI wallet checks for incoming transactions: Once very 90 seconds. And the setting to decide whether checking automatically or not is the same as well, <code>auto-refresh</code>.</p>
+
+<h3 id="mmsnote">mms note</h3>
+
+<pre><code>mms note [&lt;label&gt; &lt;text&gt;]
+</code></pre>
+
+<p>Examples:</p>
+
+<pre><code>mms note
+mms note bob Did you already submit the last transaction?
+mms note alice Yes, just waiting for the next block :)
+</code></pre>
+
+<p>Without parameters display any notes not yet read. With a label and further text as parameters send the text as a message of type <code>note</code> to the signer with the label.</p>
+
+<p>Sending notes to each other directly from one Monero wallet to the next might be a fun way to avoid having to use additional communication channels for talking to signers.</p>
+
+<p>If you want to read or re-read a particular note use the <code>mms show</code> command and look at the last line with the message content, in this case the text of the note.</p>
+
+<h3 id="mmsshow">mms show</h3>
+
+<pre><code>mms show &lt;message_id&gt;
+</code></pre>
+
+<p>Show detailed information about the message with the id used as command parameter. Useful to read or re-read notes. Binary message content is not displayed; use the <code>mms export</code> command and inspect the resulting file if you need to check such a message content.</p>
+
+<h3 id="mmsexport">mms export</h3>
+
+<pre><code>mms export &lt;message_id&gt;
+</code></pre>
+
+<p>Export the content of the message with the given id into a file with the fixed name <code>mms_message_content</code> in the current directory. An already existing file will be silently overwritten.</p>
+
+<p>There is no <code>mms import</code> counterpart command yet.</p>
+
+<h3 id="mmsset">mms set</h3>
+
+<pre><code>mms set &lt;option_name&gt; [&lt;option_value&gt;]
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>mms set auto-send 1
+</code></pre>
+
+<p>The MMS equivalent of the general <code>set</code> command. With only the name of an option show the current value of that option. With option name and option value set that option to the given value.</p>
+
+<p>The only MMS-specific setting so far that this command handles is the <code>auto-send</code> setting. If set messages are not sent out automatically right after they are created but the MMS asks for confirmation first. See also <code>mms send</code> command. As soon as you are familiar with the MMS and comfortable using it it may be a good idea to set <code>auto-send</code> to 1 for less prompts and speedier progressing.</p>
+
+<h3 id="mmsstart_auto_config">mms start_auto_config</h3>
+
+<pre><code>mms start_auto_config [&lt;label&gt; &lt;label&gt; ...]
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>mms start_auto_config bob trent
+</code></pre>
+
+<p>Start an auto-config process at the wallet of the "config manager" by creating auto-config tokens for every signer expect "me" i.e. the first one and do a <code>mms signer</code> command to display the tokens. Asks for confirmation if auto-config is seemingly already running because there are already tokens for signers in the signer configuration.</p>
+
+<p>The manager has to transmit the auto-config tokens to the respective signers outside the MMS. Note that those tokens are sensitive information: A token in the hand of a non-signer or in the hand of the wrong signer will enable that person to impersonate the rightful signer i.e. take part in all transactions in stead of that signer.</p>
+
+<p>Precondition for starting auto-config is <em>all</em> signers having a label assigned. The idea is that auto-config establishes the <strong>same</strong> labels in the wallets of all signers to make it clear to everybody who is who. (Only the order of the signers in each wallet will be different, because the owner of the wallet will always be signer #1.) Later the signers are free to change labels they don't like, as long as there is no danger to confound signers of course.</p>
+
+<p>You can establish labels for all signers using the <code>mms signer</code> command beforehand, or more comfortably right with the <code>mms start_auto_config</code> command itself, by listing all labels except the label for "me" in the correct order as command arguments.</p>
+
+<p>The command can be issued at basically any time, although of course it makes most sense at the beginning where for the wallets of all signers only <code>mms init</code> commands were executed yet.</p>
+
+<p>Check chapter <em>Auto-Config</em> for a description of the following steps after this command.</p>
+
+<h3 id="mmsauto_config">mms auto_config</h3>
+
+<pre><code>mms auto_config &lt;auto_config_token&gt;
+</code></pre>
+
+<p>Example:</p>
+
+<pre><code>mms auto_config mms561832e3eb
+</code></pre>
+
+<p>Process an auto-config token that you received from the "config manager" during an auto-config process through some reasonably secure communication channel outside of the MMS, e.g. SMS, smartphone messenger app, encrypted e-mail or phone call. Each signer gets their own distinct token. Treat any MMS auto-config tokens as confidential information.</p>
+
+<p>This will result in a message of type <code>auto-config data</code> to send your Bitmessage address and your Monero address to the manager. (Transmission of that message is already as secure as any later MMS message, as long as nobody else knows your token.)</p>
+
+<p>There is some tolerance in the way the MMS interprets entered tokens (e.g. they are not case-sensitive), and any typo will result in an invalid token with a high degree of probability and will be detected.</p>
+
+<p>If it was decided to do auto-config best refrain from entering any signer information yourself manually with <code>mms signer</code>. (The MMS won't prevent it however.)</p>
+
+<p>Check chapter <em>Auto-Config</em> for a complete list of all steps of an auto-config process.</p>
+
+<h3 id="mmsstop_auto_config">mms stop_auto_config</h3>
+
+<pre><code>mms stop_auto_config
+</code></pre>
+
+<p>Delete any auto-config tokens from signer configuration and stop any running auto-config process that way. </p>
+
+<p>Deleted tokens cannot be recoverd or reconstructed, as they are random. If you are the "config manager" and delete tokens you will never become able again to receive auto-config messages that other signers send to you using those deleted tokens. (Nobody else will receive them either, however.) Everybody will need new tokens issued by you.</p>
+
+<h3 id="mmssend_signer_config">mms send_signer_config</h3>
+
+<pre><code>mms send_signer_config
+</code></pre>
+
+<p>Manually send your complete signer configuration to all other signers as messages of type <code>signer config</code>. After receiving your message they will be able to replace their signer configuration by yours with a <code>mms next</code> command. There will be a security prompt before that happens.</p>
+
+<p>Each signer will get their label overwritten with the label you entered for them, but their own Bitmessage address and Monero address will be preserved.</p>
+
+<p>This command and its capability to "broadcast" a particular signer configuration can serve as a building block for something like a "semi-auto-config". See also chapter <em>Sending Signer Configuration</em>. Sending out a complete signer configuration is also part of fully-automatic config, although without needing a separate <code>mms send_signer_config</code> command.</p>
+
+<h2 id="security">Security</h2>
+
+<p>The MMS was carefully designed and implemented as a system offering a high degree of security.</p>
+
+<p>Which was not particularly easy: Monero multisig itself is already a multi-faceted if not to say complex process and thus not trivial to secure, and the MMS is a powerful if not to say complex system on top of that, so it's no wonder that there are various possible security issues.</p>
+
+<p>Note that this the very <strong>first</strong> version of the MMS, and it may well be that people using it in different circumstances will uncover new security problems beyond those mentioned here, or let some of them appear in a different light. There is reasonable hope however that the MMS does not have any deep and basically "unrepairable" conceptual flaws.</p>
+
+<p>TL;DR: If in doubt, start to use the MMS only after you have configured your multisig wallets yourself on your own, presumably in more secure ways than the MMS could provide (not trivial, but doable). If in even more doubt, don't use the MMS.</p>
+
+<h3 id="useofencryptionandsignatures">Use of Encryption and Signatures</h3>
+
+<p>All message content is encrypted either using the Monero viewkeys of the signers' Monero wallets, or with randomly generated keys of the same strength in the case of auto-config message contents. This may seem a little excessive given that PyBitmessage encrypts all messages itself already, but first PyBitmessage is a third-party software that you may not want to trust, and second with this feature the MMS is already prepared to some degree for less secure communication systems that don't encrypt themselves.</p>
+
+<p>Messages are signed by the sender using their view private key. This is used for authentication: The MMS will reject a message from a signer that does not carry a valid signature that only that signer, and nobody else, could have made. Furthermore, a hash secures the message content against any changes. Lastly only messages from signers are accepted: A message from a Monero address that is not listed in the signer configuration gets rejected, even if it carries a valid signature.</p>
+
+<p>The viewkey is also used to encrypt the content of the <code>.mms</code> file that contains signer configuration and all sent and received messages.</p>
+
+<p>Still, regarding data transmission security requirements one should probably stay realistic: Of course you don't want the various data packets that get shuttled back and forth between the signers' wallets to get into the wrong hands, but it would not be easy to cause real harm for an attacker holding some of that data. After all, the whole point of multisig is that only a group of people <strong>cooperating</strong> can sign off and submit a transaction. An attacker that gets hold of a partially signed transaction won't be able to do much with it.</p>
+
+<p>(An attacker eavesdropping on <strong>all communication</strong> from the very start probably could, if data was not encrypted, collect all keys and build a fully working Monero "single-sig" wallet for the multisig address and steal coins, but that's a pretty drastic scenario, and data sent by the MMS <strong>is</strong> encrypted.)</p>
+
+<h3 id="communicationmmstopybitmessage">Communication MMS to PyBitmessage</h3>
+
+<p>Communication between the MMS and PyBitmessage is, unfortunately, not encrypted. Here, HTTP is used, not its encrypted counterpart HTTPS. Message content is of course encrypted <strong>before</strong> the MMS transmits a message to PyBitmessage, and any content changes would be detected when receiving messages, but somebody listening there could learn things from the "metadata": Who sends what to whom at which point in time.</p>
+
+<p>As long as your Monero wallet with the MMS and PyBitmessage run on the same machine, that's not a big danger in itself, because anybody who can listen on such strictly local communication <code>localhost</code> to <code>localhost</code> already sits inside your computer, in which case you have probably lost anyway, with the trojan listening to the traffic between MMS and PyBitmessage being the least of your worries.</p>
+
+<p>But because of this it's not a good idea to set up a PyBitmessage instance reachable over the Internet, as some kind of "public node".</p>
+
+<p>There is a second problem: The PyBitmessage API is only secured by a username and a password that has to be transmitted in cleartext with every HTTP request. It would be not very hard for an attacker to pick up username and password and starting DOS-type attacks, e.g. by deleting all messages in 10-second intervals.</p>
+
+<p>(In PyBitmessage's defense one must say that is was <strong>not</strong> designed as a server that can face the big wide bad Internet, but as a program to run locally; it's hardly surprising that running it outside its intended use case leads to problems.)</p>
+
+<h3 id="impersonation">Impersonation</h3>
+
+<p>If Alice the buyer and Bob the seller use 2/3 multisig for <em>escrow</em> there will be Trent as a trusted third person that can arbitrate in case of problems and either help Alice get her money back if Bob does not deliver by signing a transaction started by Alice, or helping Bob getting his money if Alice likely got her wares but pretends otherwise and refuses to sign the payment to Bob.</p>
+
+<p>In this <em>escrow</em> situation you really want <strong>three</strong> distinct persons in play. If Bob somehow can <em>impersonate</em> Trent by posing as him, by pretending to Alice to be two persons Bob plus Trent, and set up <strong>two</strong> different wallets with two sets of keys, Bob will be able to make those 2/3 multisig transactions valid all on his own and cheat.</p>
+
+<p>How big this danger of impersonation is depends on how secure the initial exchange of key sets is at the very beginning of the whole process, when configuring the wallets and finally "going multisig": If you can assure that only the right people get the right key sets, and nobody can pose somehow as somebody else, everything is alright. If not, you may loose.</p>
+
+<p>If you use the full capabilities of the MMS you don't use it only to transact, but already before that, to exchange key sets between all signers. Especially for higher forms of multisig like 2/4 with multiple key exchange rounds this is very helpful and less error-prone than some manual process. So, the task to prevent impersonation shifts from securing the exchange of keys to securely setting up signer addresses in the MMS: If Bob can somehow trick Alice into accepting one of <strong>his</strong> Monero and Bitmessage addresses in stead of those of Trent, he has won.</p>
+
+<p>The three methods of setting up signer addresses that the MMS supports, manually configuring signers, auto-config and the "semi-automatic" sending of completed signer information, all have different risks associated with them regarding impersonation. Check the respective chapters <em>Manually Configuring Signers</em>, <em>Auto-Config</em> and <em>Sending Signer Information</em> for some more info about this.</p>
+
+<p>Auto-config is by far the easiest to secure: You only have a tiny bit of information, an 11-character auto-config token, to transmit securely to each signer, and if you can do that, you have already won. (The "config manager" is of course assumed as trustworthy here.)</p>
+
+<p>If this all sounds too complicated and therefore not trustworthy to you, you do have the option to configure wallets and establishing the multisig address leaving the MMS completely out of the picture and only later using it to comfortably send partially signed transactions around and relieve you from the tedious manual syncing of wallets after each transaction.</p>
+
+<h3 id="attackercontrolleddata">Attacker-Controlled Data</h3>
+
+<p>There are two situations where your MMS-using wallet receives data from another signer where that other signer, if acting in bad faith, could try to deceive you or trick you into doing something harmful:</p>
+
+<p>Notes as transmitted by the <code>mms note</code> command can be used for "social engineering". An attacker could e.g. try to formulate a note that looks like an error message in an attempt to deceive. The technical possibilities here are quite limited however: Notes are strictly textual only, and when displaying them the MMS filters out characters with ASCII codes less than 32 and the two characters "&lt;" and ">" that could be used to build HTML or XML that might get interpreted somehow (very unlikely in the CLI wallet, but somewhat more likely in GUI-based wallets.) There is also a length limit for notes.</p>
+
+<p>The second way is an attempt to deceive with labels that are sent through <code>mms send_signer_config</code>. Bob could label Alice as <em>trent</em> and Trent as <em>alice</em>, send that signer configuration to Alice and somehow convince her to use that. This is the reason why a message of type <code>singer config</code> if sent outside of auto-config with an explicit <code>mms send_signer_config</code> is not processed right away, but displayed first together with a confirmation prompt.</p>
+
+<h2 id="troubleshooting">Troubleshooting</h2>
+
+<h3 id="solvingsyncingtroubles">Solving Syncing Troubles</h3>
+
+<p>As explained in the chapter <em>Syncing Wallets</em> Monero multisig requires the exchange of some data between wallets after sending as well as receiving transactions, called <em>multisig sync data</em> in the MMS.</p>
+
+<p>Sometimes things get out of sync somehow. There are four possible signs that this may have happened:</p>
+
+<ul>
+<li>The <code>balance</code> command shows a message <em>Some owned outputs have partial key images - import_multisig_info needed</em> that "refuses go away"</li>
+
+<li>The wallet tells you <em>That signature was made with stale data</em> and refuses to process a transaction further</li>
+
+<li>The wallet tells you about missing keys when you try to sign a transaction</li>
+
+<li>The wallet accuses you of a double-spending attempt with you probably trying nothing like that</li>
+</ul>
+
+<p>In some such cases the MMS fails to become aware of the problem and simply tells you after <code>mms next</code> that there is nothing to do instead of starting a sync round.</p>
+
+<p>Because of this there is a way to <strong>force sync</strong> at basically any time:</p>
+
+<ul>
+<li>All signers issue a <code>mms sync</code> command instead of simply <code>mms next</code> to send sync info to each other</li>
+
+<li>After receiving those messages all signers issue a <code>mms next sync</code> command - note the extra argument <code>sync</code></li>
+</ul>
+
+<p>For syncing to work all information must be from the same "height" i.e. produced with the same number of transfers recorded in the wallets of all signers: If for example one signer somehow does not receive a transaction and sends out sync information in this state, it will be of no value to other signers with complete wallets.</p>
+
+<p>If the MMS seems to ignore not yet processed sync data messages in state <code>waiting</code> most probably it does so because of this reason. When in doubt check the column <code>Height</code> in a list of messages that you get with <code>mms list</code>.</p>
+
+<p>Sometimes such not yet processed messages that became unprocessable trip up the <code>mms next</code> command. If that happens use <code>mms delete</code> to delete any message with a too-low height.</p>
+
+<h3 id="redirectingatransactiontoanothersigner">Redirecting a Transaction to Another Signer</h3>
+
+<p>If in cases like 2/3 multisig you sent a partially-signed tx to somebody, but later change your mind and want to send it to somebody else, there is a little trick to do so: Locate the message of type <code>partially signed tx</code> addressed <strong>to yourself</strong> and issue a <code>mms send</code> command for that message. After reception, do <code>mms next</code>. You will be given choice again what to do with it.</p>
+
+<p>Of course you are free to ignore that transaction and start a new one. Just consider that this new transaction might run into a roadblock later on if the first one gets fully signed and submitted to the network <strong>earlier</strong> than this second one.</p>
+
+<h3 id="ignoringuncooperativesignerswhensyncing">Ignoring Uncooperative Signers when Syncing</h3>
+
+<p>The normal MMS wallet syncing process assumes that all signers are cooperative and send out sync data messages after sending or receiving a transaction. <code>mms next</code> will therefore wait until it holds sync data messages (for the same "height") from <strong>all</strong> other signers before usually processing them.</p>
+
+<p>However, with <em>M</em> being smaller than <em>N</em> in configurations like 2/3 multisig you can successfully sync with only (number of required signers minus 1) sync messages. <code>mms next</code> will tell you when you have reached this lower threshold and give a hint how to override and go ahead early: Use <code>mms next sync</code>.</p>
+
+<p>If later you receive more sync data messages nevertheless just delete them with <code>mms delete</code>: They are unneeded, unprocessable for you and worst case will mess up the the next sync round.</p>
+
+<p>Usually if you initiate sync the MMS will create messages to <em>all</em> other signers. If you want to prevent that to make it as hard as possible for other signers to transact further, make sure to set <code>auto-send</code> to false, answer "No" when first being asked to send, and manually delete any unwanted messages before sending the rest out with <code>mms send</code>.</p>
+
+<h3 id="recoveringfromlostorduplicatemessages">Recovering from Lost or Duplicate Messages</h3>
+
+<p>If you miss a message for any reason, because PyBitmessage failed to deliver it or because you deleted it too early, ask the sender of the message to send it again using the <code>mms send</code> command.</p>
+
+<p>Note that messages sent multiple times do <em>not</em> automatically cancel out each other on the receiving end. If you resend e.g. just because somebody is impatient the addressed signer may end up receiving <em>two</em> messages of the same type with the same content.</p>
+
+<p>If later the missing message belatedly shows up, that's not good, but you can solve this easily by using a <code>mms delete</code> command and get rid of one of the two copies.</p>
+
+<h3 id="correctingupdatingsignerinformation">Correcting / Updating Signer Information</h3>
+
+<p>You can use the <code>mms signer</code> command to change a label <code>bob</code> that you don't like anymore:</p>
+
+<pre><code>mms member 2 bob-the-builder
+</code></pre>
+
+<p>With one more argument you can change Bitmessage addresses if needed:</p>
+
+<pre><code>mms member 2 bob BM-2cSrgmut9AD6bdU8b8GXd36iUYDjCS9xJb
+</code></pre>
+
+<p>You can even change Monero addresses in the same way (with the exception of your own of course), but with a limitation, only as long as there are no received messages. As soon as wallets are multisig it does not make sense anymore to change any Monero addresses anymore anyway.</p>
+
+<h3 id="startingfromscratch">Starting from Scratch</h3>
+
+<p>If the state of the MMS for a wallet is messed-up beyond repair and you want to start from scratch, or if you want to stop using the MMS for a particular wallet, locate the wallet files in the file system and just delete the file with the <code>.mms</code> extension.</p>
+
+<h3 id="mmspybitmessageinteractions">MMS / PyBitmessage Interactions</h3>
+
+<p>Here some details about the interaction between the MMS and PyBitmessage to better understand any problems that may occur there:</p>
+
+<p>The MMS tries to limit the number of messages that pile up in PyBitmessage's store and deletes them. However, for enhanced reliability it does not delete right after receiving already but only after a message changes its state from <code>waiting</code> to <code>processed</code>, or if you delete it from the message store. Sometimes messages get orphaned and the MMS has no chance to delete; you can safely delete such messages interactively in PyBitmessage itself.</p>
+
+<p>If you use auto-config new addresses / identities will be created in PyBitmessage automatically for the MMS. It tries to delete those after finishing config, but note that the current version of PyBitmessage continues to display deleted addresses until next program restart: Harmless in principle, but somewhat confusing.</p>
+
+<p>If such dynamic auto-config addresses don't get deleted at all e.g. because you delete a wallet beforehand unfortunately it seems there is no simple way in the current PyBitmessage version to get rid of them: You will have to manually locate and edit the <code>keys.dat</code> file and delete the corresponding lines (while hopefully not damaging anything else in there...)</p>
+
+<p>Sometimes messages seem to get stuck and not sent out; try to restart PyBitmessage in such cases.</p>
+</body>
+</html>
