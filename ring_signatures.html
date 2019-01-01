@@ -1,0 +1,86 @@
+<html>
+<head>
+<title>"Ring Signatures" - A Monero Science-Fiction Short Story</title>
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; width: 70em; line-height: 120%;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+<h1 id="ringsignatures">Ring Signatures</h1>
+
+<p>You may be forgiven to think that cryptocurrencies went out of fashion: It's a few years now already since 2017 when even the proverbial taxi driver gave you the advice to invest in Bitcoin. Well, Bitcoin is still alive and kicking, although with a lot less noise and hype, and some other cryptocurrencies even survived the long <em>crypto winter</em> of 2018 and 2019 together with it. Today I want to tell you a story about one of them that is dear to my heart because I still help building it: <em>Monero</em>.</p>
+
+<p>Around summer last year a new user with a nickname of <em>DrZettabyte</em> became a frequent poster in the Monero Internet forum on Reddit where most fans of the currency still use to hang around. I remember how I looked up "zettabyte" in Wikipedia, but 10 to the power of 21 still did not yet tell me much except maybe my poor brain would never truly grasp a size of a billion terabytes.</p>
+
+<p>He wrote he was physicist and developing the ultimate storage solution, or better Ultimate with capital "U", fast, small, cheap and with almost unlimited capacity: The whole content of the Internet stored in your pocket many times over for a few bucks, hence <em>DrZettabyte</em>. He wasn't telling how exactly it is supposed to work and dropped some mysterious hints about "storing bits at atomic level" and "using quantum tunneling effects". Most people did not believe anything of that, but as a "Redditor" you are used to all kinds of nonsense, and that doctor was entertaining, in a "mad scientist" way - at least at first.</p>
+
+<p>The poor man was living in genuine fear. He said that as soon as his storage solution comes to market all the flash memory producers worldwide, and the few remaining hard disk producers anyway, will go bankrupt more or less overnight: A few small factories would be enough to supply the world with more storage capacity than it would ever need. And as companies usually don't like to go bankrupt he was sure the bigger ones would do <em>anything</em> to stop him. Even killing him if they saw no other way.</p>
+
+<p>That's why he became hell-bent on staying anonymous. And also why he finally landed, of all the many places on the Internet, in the biggest Monero forum.</p>
+
+<p>You have to know that Monero is one of the leading so-called <em>privacy coins</em> that makes it almost impossible to find out who pays how much to whom, and when. DrZettabyte needed funds for further development of his storage solution until it became fully ready for mass-production. He planned to order all investors to pay him in Monero only, so he could stay anonymous and completely untouchable, safe from any rented hitmen by South Korean and Japanese memory companies.</p>
+
+<p>He wanted to learn as much as possible about Monero and find out whether it was <em>really, truly</em> private. Some dozens of critical but sensible posts later which at least proved that he was good at logical thinking he was finally zooming in on ring signatures.</p>
+
+<p>Basically Monero has three different mechanisms to achieve full privacy for its transactions: one that that hides how much is transferred, another one that hides who receives the coins that get sent, and a third one hiding the sender of the coins. The last one uses those <em>ring signatures</em>.</p>
+
+<p>You probably need to be pretty good at cryptography and math to exactly understand how they work, but the basic principle is not very hard to understand:</p>
+
+<p>In a simplified way you can say a Monero transaction does not only contain info about one payment because that would of course make it immediately clear <em>where</em> that came from: Look at the source, see the sender. A transaction contains <em>several</em> payments: One is the real payment, and the other ones are decoys merely there to mask everything. They form a clever mathematical construct called a <em>ring</em> where the receiver can, by the power of holding some secret cryptographic key, process the transaction nevertheless, but you as an outsider see only a heap of payments, each more or less equally likely to be the "true" one.</p>
+
+<p>(Now I imagine people who know how cryptocurrencies <em>really</em> work frowning, maybe even mumbling "Huh, what payments? There are no payments, only <em>inputs</em> and <em>outputs</em>", but hey, admit it, that stuff is so abstract, I would probably lose most readers before I finished fully explaining <em>that</em>.)</p>
+
+<p>Despite being rather cool ring signatures form the weakest of Monero's three privacy mechanisms if you ask me. Mind you, not weak, but just the weakest of the three in comparison, and that worried our doctor. The fact that over the years the size of the rings had become bigger and bigger - it currently stands at 23 - did not comfort him much.</p>
+
+<p>Where's the problem? Let me show you with a hypothetical scenario. Imagine being on vacation in a big city with unfortunately many pickpockets, one of which steals your wallet today on a crowded plaza. You go the nearest police station and the officers tell you to your delight that they are pretty sure they caught that thief already. Now they only need your cooperation to make sure that he will get punished: You have to correctly identify him in a lineup, or if you are rightpondian, in an "identity parade".</p>
+
+<p>As you finally stand in front of 23 men lined up (23 payments in the ring of a Monero transaction, see?), with the suspect among them for sure, you have one small problem: You did not get to see him back on the plaza when he robbed you, you have no idea how he looks.</p>
+
+<p>Then you have an inspiration. You had noticed how the police, just before that lineup, went out to the plaza to fetch 22 men at random to present to you together with the suspect. If somehow you could get the whole show to repeat, but with 22 <em>different</em> men plus suspect, the latter would stand out as the only one present in <em>both</em> lineups. This would allow you pretending to identify him with certainty, and he would get his (hopefully) just punishment.</p>
+
+<p>So you make up some heart-wrecking story how you are still under grave shock from the robbery, with your brain more or less mush at the moment, and ask the police nicely whether you can come back tomorrow for a repeat of the lineup, perfectly knowing that tomorrow it will be <em>22</em> different men fetched from the plaza plus suspect. The police agrees, you succeed and all is well.</p>
+
+<p>This scenario surfaced mirrored more or less one-to-one in the world of the Monero cryptocurrency sometime in 2016 or 2017, not as a success story of course, but as a potential privacy problem.</p>
+
+<p>The program you use to create a Monero transaction - it's called <em>wallet</em> - has to submit it to another program called <em>daemon</em> for execution. Usually that daemon doesn't get to know the true payment because when it sees your transaction first, the ring with all 23 payments is already fully formed. That's like you want it to be; among other advantages this arrangement allows you to use a daemon not under your own control without too many dangers, one that other helpful people operate for your convenience in the "cloud".</p>
+
+<p>But people realized that you could doctor the daemon and teach it a sneaky new trick: When your wallet submits a transaction, the rogue daemon records every payment in it and then tells your wallet "Uh sorry, something went wrong with your transaction, please try again". If you the user would order the wallet to retry shortly afterwards, it would fetch 22 <em>new</em> decoy payments, make another transaction with a new ring, and submit again to the daemon which - you should be able to guess already - only has to look for the one common payment in both transaction versions to find out the true payment. Not good.</p>
+
+<p>That particular problem was easy enough to mitigate - just make the wallet stick to the same 22 decoys for the second attempt to deliver a transaction - but some doubts about the whole system continued to linger. Our dear DrZettabyte became more and more vocal over time and insisted on replacing ring signatures by something <em>absolutely</em> watertight.</p>
+
+<p>When the Monero developer community had to deny his wish because ring signature replacements were either not yet ready or had serious drawbacks, he lost his cool completely and posted long tirades on Reddit how he won't rest until he finds that one devastating exploit to make ring signatures completely unsuitable for further use. He would force the hands of the programmers and finally get the perfectly private coin to finance his project.</p>
+
+<p>Such threats were nothing new of course, and so far nobody had ever been able to pull them through, but who knew with a brilliant mad physicist ...</p>
+
+<p>Then his account went silent for a number of months. He finally resurfaced about two weeks ago and was even more scared than before, which seemed quite a feat to us forum regulars who know him since the beginning. He said that he has indeed cracked ring signatures wide open, but in such an astonishing way that he is at a loss what to do with his feat.</p>
+
+<p>Finally he agreed to tell how he did it to a small circle of people in a private virtual meeting room on one of the communication servers of the Monero community. I was there, and his story was really breathtaking:</p>
+
+<p>When he had a working zettabyte-style storage device ready, the first thing he stored on this prototype was the Monero blockchain, the records of <em>every</em> transaction ever done since the very beginning of the currency back in 2014, which now has a size of something over 100 gigabytes, a nice non-trivial size suitable for such an early test run.</p>
+
+<p>When he tested reliability by reading a particular transaction over and over again from the blockchain it was different some of the times. Naturally his first thoughts were about some problem with "noise", easy to understand when working on levels so small that single atoms can dance around like crazy because of thermal effects, but over time he noticed something very strange. His device did not simply read back the test transaction with some random wrong bytes in it, no, the errors were on a much higher level. Most of the time everything was alright with only one quite surprising twist: The rings were different!</p>
+
+<p>After further careful and systematic testing he found out how he had to modify the equivalent of the "read head" to reproduce and control the phenomenon, that part of his device which reads out data from the storage medium using the mysterious quantum tunneling effect that DrZettabyte still was not willing to fully reveal.</p>
+
+<p>And so it came to be that he is able to break ring signatures: Reading different rings for the same transaction by slightly tweaking the read head and take note - of course - which single payment never changes.</p>
+
+<p>Does DrZettabyte have any hypothesis where the hell those different rings come from? For all we know, there is exactly <em>one</em> true Monero blockchain, and however many times you read a transaction, even from some fancy freaky quantum effect drive, it should come out exactly the same every time, certainly <em>not</em> with different rings!</p>
+
+<p>Yes, he has a theory, and exactly here the real fun starts. Thanks to that quantum tunneling effect his device is somehow able to read Monero blockchains from neighboring parallel universes very close to our own universe, so close that in those blockchains you can find identical transactions, only with different rings. It seems the random generator used to decide which payments to fetch as decoys is so dependent on the exact universe it operates in, it comes up with other rings already in the closest possible parallel universes.</p>
+
+<p>To say we were all baffled reading this during our little secret online conference is quite an understatement. Over time I have seen quite a number of crazy conspiracy theories appear in the Monero Reddit forum, about how the NSA has long ago already cracked all privacy coins including Monero with some secret quantum computers in the basement of their headquarter, or how the government plans to kidnap the most influential Monero developers and force them to build a secret backdoor into Monero that allows law enforcement to simply circumvent the privacy mechanisms, and many more.</p>
+
+<p>But peeks into parallel universes on the list of threats to Monero's privacy? Seriously?</p>
+
+<p>Then, a few days ago, two things happened: DrZettabyte suddenly went silent again, and shortly afterwards a very suspicious transaction was submitted to the Monero blockchain, the biggest there ever was, filling one complete block all on its own, with a big blob of encrypted data attached. We remembered that he once mentioned having set up an automatic system that would, in case of his untimely death, automatically start a Monero transaction to make sure his research and development results would not get lost.</p>
+
+<p>And so here we are, trying to decrypt the attachment of this transaction, without success so far. Still, whether we finally succeed or not, and whether somebody will ever again build a trans-dimensional drive reading data from parallel universes or not, the days of ring signatures in Monero are probably numbered at last. The brilliant cryptography guys from the Monero Research Lab are working on it. Just please nobody tell them the full truth, we don't want them to freak out and become unable to work.</p>
+
+<p>After all I already have nightmares about successfully decrypting the DrZettabyte transaction attachment and getting immediately snatched by the inter-dimensionality police tasked to prevent any information leakage between universes. They enter my home through a portal with the form of a ring, with 23 Monero payments arranged along the rim, the true one glowing bright red ...</p>
+</body>
+</html>
