@@ -1,0 +1,114 @@
+<html>
+<head>
+<title>Monero Integration into Bisq</title>
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; width: 70em; line-height: 120%;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+<h1 id="monerointegrationintobisq">Monero Integration into Bisq</h1>
+
+<h2 id="background">Background</h2>
+
+<p>I (<em>rbrunner7</em>, currently active as a Monero dev) became interested in Bisq and possible ways of integrating Monero into Bisq. I went on to investigate what such an integration would mean, how it would have to work technically, and how much work that would entail. Here I write down the results of my investigation plus a lot of links to info about Bisq in general, to further the understanding of the challenge at hand, and possibly to help anybody who ever intends to actually start working on this.</p>
+
+<p>I don't claim that I understood every detail about Bisq and everything about possible ways and difficulties of integrating Monero there, but I think I know enough about all the involved technologies to be not completely wrong in my analysis.</p>
+
+<p>Disclaimer: Many things I write here are clearly my personal opinions; yours may certainly differ.</p>
+
+<h2 id="whatisbisq">What is Bisq</h2>
+
+<p>According to the statement on the <a href="https://bisq.network/">project homepage</a>: "Bisq is an open-source, peer-to-peer application that allows you to buy and sell cryptocurrencies in exchange for national currencies. No registration required."</p>
+
+<p>Currently Bitcoin is always one part of the exchanged currencies. One cannot trade alternative cryptocurrencies for national currencies, only Bitcoins for alternative cryptocurrencies like Monero, or Bitcoins for fiat currencies.</p>
+
+<p>It seems that currently buying and selling XMR with/for BTC dwarfs all other kinds of trades; see e.g. <a href="https://www.reddit.com/r/Monero/comments/9evf8j/98_of_transactions_on_bisq_are_xmrbtc/">this Reddit thread</a> from September 2018 where 98% percent of Bisq volume was XMR/BTC. Check <a href="https://coinmarketcap.com/exchanges/bisq/">here</a> on CoinMarketCap for actual numbers.</p>
+
+<p>There is a <a href="https://www.youtube.com/watch?v=sfA55mHwMl4">Monero Talk video</a> on YouTube with Bisq's founder and lead dev Manfred Karrer showing how to trade XMR on Bisq and giving quite good background info about Bisq in general.</p>
+
+<p>Technically it's a program that you run locally on your OS (versions are available for Windows, Linux and macOS) that will connect to other instances running at the same time on other computers, building a decentralized peer-to-peer network without servers.</p>
+
+<p>From their <a href="https://docs.bisq.network/exchange/whitepaper.html">Whitepaper</a>, section "Technology": "The Bisq application is built in <strong>Java 8</strong> with <strong>JavaFX</strong> for the GUI. For interaction with the Bitcoin network the <strong>bitcoinj</strong> library is used. For decentralized messaging and data storage a custom flooding (gossiping) network over Tor is used."</p>
+
+<p>In short: It's Java all the way down.</p>
+
+<h2 id="useoftorandbitcoin">Use of Tor and Bitcoin</h2>
+
+<p>Bisq communicates over the Tor network and does so seamlessly: Install Bisq, Tor communication components are automatically installed as well, start Bisq, use Tor. It seems that since version 0.4.9.8 from November 2016 (see <a href="https://bisq.network/roadmap/">roadmap</a>) <strong>all</strong> traffic goes over the Tor network, nothing over clearnet.</p>
+
+<p>Bisq uses BTC as the currency for the trade (BTC currently is always on one side of the trade, see above), for paying security deposits (securing trades: cheaters will probably loose the deposit) and for paying fees. For handling those payments Bisq configures internal Bitcoin wallets for traders and makes Bitcoin transactions on their behalf. Like with Tor, this is all fully automatic and seamless, what may be a very big part of Bisq's user friendliness and popularity: Install Bisq, everything necessary to use BTC is automatically installed as well, start Bisq, use BTC.</p>
+
+<p>Default is reaching out to <code>.onion</code> Bitcoin nodes over Tor, but you can also use the public Bitcoin network or your own local node. You can also use Bitcoin testnet.</p>
+
+<h2 id="useofmultisig">Use of Multisig</h2>
+
+<p>Bisq works with <strong>2/3 multisig</strong> bitcoin wallets and transactions: The buyer holds one key (or better their Bisq instance holds the key internally for them), the seller holds one key, and a third key is made available to an arbitrator registered with Bisq in the case of a dispute. Normal case is of course that the seller and the buyer use their two keys to transfer the BTC to trade to whomever shall receiving them to successfully conclude the trade.</p>
+
+<p>Bisq users don't have to know or learn anything special to use that 2/3 multisig, they just need to be aware about what that means, i.e. that any two people out of the group (buyer, seller, arbitrator) can transfer BTC out of the 2/3 multisig wallet that Bisq configured for them behind the scenes in a fully automatic way, but of course not a single person alone.</p>
+
+<p>The non-BTC side of the trade, i.e. the side that involves sending an amount of fiat currency or an amount of an "altcoin" from buyer to seller or vice-versa happens completely outside of Bisq. The seller and the buyer have to arrange that transfer themselves outside of Bisq and are more or less free how they actually transfer.</p>
+
+<p>For example if I buy XMR for you for BTC through Bisq you will need access to a working Monero wallet under your control with the necessary amount of XMR to send them to, and of course I myself need a working Monero wallet to receive them.</p>
+
+<h2 id="bitcoinwallet">Bitcoin Wallet</h2>
+
+<p>Fully apart from all the functions to trade BTC Bisq contains a simple but complete Bitcoin wallet. You can use it to manage Bitcoins that you own, just like with any other conventional Bitcoin wallet, whether you want to trade them or not. This wallet does not support multisig. Use of it is completely optional, but of course it's quite comfortable to fund your trades directly out of this wallet instead out of a separate one. You hold the keys to this wallet; Bisq itself never holds <strong>any</strong> funds.</p>
+
+<h2 id="basecurrencies">Base Currencies</h2>
+
+<p>Bisq used to support other base currencies beside BTC. <em>Base currency</em> in this context means a cryptocurrency other than BTC taking on the role that BTC now has for trading, i.e. to trade <strong>that</strong> currency for other cryptocurrencies or for fiat currency, plus pay security deposits and fees in thas currency.</p>
+
+<p>This of course included use of 2/3 multisig for the alternative base currency to secure trades and make arbitration possible. Any coin without support for multisig would not have been possible as Bisq base currency.</p>
+
+<p>Beside BTC Bisq used to support Bitcoin Cash, Litecoin, DASH and Dogecoin as base currencies. It seems there was a dialog box at startup to choose the base currency to use for the current run.</p>
+
+<p>This all is no more, primarely because liquidity for those in the role of base currencies was simply not there at the end. Read e.g. <a href="https://github.com/bisq-network/proposals/issues/21">this GitHub issue</a> from May 2018 when LTC removal was suggested, and check the <a href="https://bisq.network/roadmap/">roadmap</a> for info which alternative base currency was dropped at which time.</p>
+
+<p>So in any case, don't confuse base currencies with traded currencies: Of course you can still buy and sell all those mentioned currencies like Litecoin or DASH on Bisq, but you will have to buy them with BTC or sell them for BTC (where before as base currencies you could buy and sell them using <strong>any</strong> of the many supported currencies, given that someone was willing to trade.)</p>
+
+<h2 id="xmrasbasecurrency">XMR as Base Currency</h2>
+
+<p>Given how strongly XMR dominates trading on Bisq (see chapter <em>What is Bisq</em> above) it's not suprising that there is considerable interest from the side of Bisq users for the fullest possible integration of Monero into Bisq, which would mean Monero as a base currency. See e.g. the reactions on <a href="https://www.reddit.com/r/Monero/comments/9qkxrf/fyi_call_for_developers_manfred_karrer_founder_of/">this Reddit thread</a> to <a href="https://github.com/bisq-network/proposals/issues/51">this proposal on GitHub</a>.</p>
+
+<p>However, Manfred Karrer, Bisq founder and lead dev, says <a href="https://bisq.community/t/monero-in-bisq/3680/16">the following</a> about this subject: "Adding XMR as base currency is a huge effort. I would estimate 3-6 months for a dev experienced with Bisq and Monero."</p>
+
+<p>After having looked into this myself a bit, I am not suprised about this estimate in the least.</p>
+
+<p>Take multisig: As already mentioned I see it as essential for Bisq that support for 2/3 multisig while trading is completely seamless and trivial to use for the traders. Monero multisig is considerably more complex than Bitcoin multisig, and it would take quite some effort to arrive there. (My own <em>Multisig Messaging System</em> would probably be of not much help, as the environment is quite different, and the UX approach as well.)</p>
+
+<p>Take transacting in general: Now with Bitcoin you don't need to run any other program beside Bisq to transact because Bisq itself contains already everything necessary. That seems impossible with Monero; there are Java bindings to connect to a Monero wallet over RPC (check <a href="https://github.com/monero-ecosystem/monero-java-rpc">the "monero-java-rpc" project here</a>), but no full Monero wallet implementation in Java that could become a part of Bisq (licensing issues aside).</p>
+
+<p>So an instance of the <code>monero-wallet-rpc</code> binary running beside Bisq would be needed, and all you could do is making that as simple and painless as possible (which, of course, takes effort if done well). It's not clear to me whether it would be possible to keep another quality feature of Bisq, that all traffic runs over Tor, with this constellation.</p>
+
+<p>And another little problem: As far as I know there are currently exactly zero "devs experienced with Bisq <strong>and</strong> Monero" on the level that is necessary for this demanding job. This alone could add one or even two months of learning and getting acquainted with everything on top of that "3-6 months" estimate.</p>
+
+<h2 id="monerowalletinbisq">Monero Wallet in Bisq</h2>
+
+<p>If you go one level down from base currency support you arrive at being able to manage your XMR right there in Bisq, without the need for another wallet, like it is now the case with Bitcoin (see chapter <em>Bitcoin wallet</em>).</p>
+
+<p>Interestingly, the already-mentioned <a href="https://github.com/bisq-network/proposals/issues/51">proposal on the Bisq GitHub</a> that was so well received on Reddit talks "only" about that, as a (more attainable) first step: "Add Monero wallet features to Bisq".</p>
+
+<p>Personally, I see this still as a quite substantial work, plus a job best suited for an experienced Java dev of course (which I, for one, am not). And I doubt somehow the "return on investment": For the traders it could be more comfortable alright, but maybe that big development effort would be better spent elsewhere, for more essential and less "nice to have" things.</p>
+
+<p>Finally somehow I am quite unsure whether this would really be the breakthrough or at least advancement that people are hoping for.</p>
+
+<h2 id="thefutureofbisq">The Future of Bisq</h2>
+
+<p>It seems that Bisq, or better the community of Bisq core devs, have decided to take Bisq into a new direction that leads away from Bitcoin as base currency mid-term or long-term, and also away from <strong>any other</strong> base currencies like XMR.</p>
+
+<p>The final goal seems to be to re-build Bisq around the <em>Bisq Token</em> (symbol <em>BSQ</em>), Bisq's very own cryptocurrency if you like. It has (or will learn) features that make it especially suitable to orchestrate trading and arbitration on Bisq.</p>
+
+<p>You find much more about this in the <a href="https://docs.bisq.network/dao/phase-zero.html">"Phase Zero"</a> document and in more specific ways in <a href="https://github.com/bisq-network/proposals/issues/32">this GitHub issue</a> titled "Off chain trade protocol".</p>
+
+<p>Read also lead dev Manfred Karrer's first sentence <a href="https://bisq.community/t/monero-in-bisq/3680/16">here</a> (emphasis mine): "Adding Monero wallet support to Bisq would be a feasible first step and will be still a valuable feature <strong>if we move one day to the off-chain trade protocol</strong> (https://github.com/bisq-network/proposals/issues/32)."</p>
+
+<p>I confess that I did not read fully through all this and much less understand it all, and things may be still in flux anyway, but I got the impression that the general direction where Bisq is headed does indeed lead <strong>away</strong> from base currencies like Bitcoin, or Monero at that.</p>
+
+<p>If this analysis is correct this makes a huge "Monero as Bisq base currency" project even more problematic. As I see it, you really don't want to work against the long-term evolution strategy of a project, at least not while spending so much effort.</p>
+</body>
+</html>
