@@ -1,0 +1,101 @@
+<html>
+<head>
+<title>"Pump and Dump" - A Monero Science-Fiction Short Story</title>
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; width: 70em; line-height: 120%;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+<h1 id="pumpanddump">Pump and Dump</h1>
+
+<p><em>Looking for a Monero dev</em>: That was the subject of the e-mail that Joe had sent me to establish contact. I doubt that's his real name, but I don't care too much, I am glad the crazy adventure I went through with him is over now and he vanished again from my life.</p>
+
+<p>In that first mail he did not yet come to the point why he needed my help, but offered me a sizable sum of money in the form of a Monero payment if I agreed to keep all our conversations strictly confidential, whether I accepted the work he had for me or not. I should have known better, but curiosity (and the money of course) got me, and I accepted.</p>
+
+<p>He did not seem to know many technical details yet about the workings of cryptocurrencies in general and Monero in particular, and so his first attempt of formulating my job wasn't easy to understand. He wrote that he wanted me to build an "alternate Monero blockchain" and asked how long that would take.</p>
+
+<p>That sounded to me like he wanted to launch a so-called <em>51% attack</em> on Monero. </p>
+
+<p>Let me try to explain. In most cryptocurrencies thousands of people called <em>miners</em> compete against each other and all try to solve something like an incredibly hard mathematical puzzle using their computers, with the winner i.e. the one solving the puzzle first getting a sizeable reward, and then everything starts over again with a new puzzle.</p>
+
+<p>Every time a puzzle is solved a number of transactions can be packaged into a <em>block</em>, and that new block gets appended to the <em>blockchain</em>, the ledger containing all valid transactions that ever happened since the beginning, which in the case of Monero means 2014.</p>
+
+<p>If you manage somehow to amass so much computing power under your own control to be able to "out-puzzle" all the other miners combined things get interesting. As soon as you command 51% of all mining power (hence the name <em>51% attack</em>) you can basically become <em>master of the blockchain</em>, make the most recent blocks invalid again and rewrite them more to your liking, usually for financial profit with a scheme called <em>double-spending</em>.</p>
+
+<p>Thing is: Monero has so many miners that launching a successful 51% attack would be a monumental and quite costly undertaking, and so I wrote to Joe that I saw no realistic chance to help him there. Beside I didn't want to help with some crime quite in general.</p>
+
+<p>It turned out that he had something very different in mind than an alternative to the current, living Monero blockchain, with his own blocks at the very end to steal other people's money.</p>
+
+<p>Imagine, he explained me, that already back in 2014, when Monero was still very young, there was a fork, and a <em>second</em> Monero blockchain came into being, independent from the one blockchain that everybody knows today. That blockchain enabled something like a shadow version of the Monero currency that was then used independently, up to present days.</p>
+
+<p>Call it <em>Monero Dark</em>, Joe wrote jokingly, used in the Darknet out of the eyes of the public, with only few people knowing about its existence.</p>
+
+<p>My job: Create something that looked convincingly like that blockchain, containing more or less the same number of blocks as the "real" blockchain, but of course different and also smaller blocks, because there were less users of Monero Dark.</p>
+
+<p>After some thinking I came to the conclusion that I could do that: Put up a number of computers as miners building blocks, and some more to create transactions at random to fill those blocks, in a believable pattern: on some days more transactions, on other ones less, and so on. The end result would be something that indeed looked like an alternate Monero blockchain, with some fraction of the size of the real one.</p>
+
+<p>As a final twist Joe sent me a file that I had to attach to one of the transactions in the very first Monero Dark block after the fork, the earliest block that was different. As if the whole scheme wasn't crazy enough already!</p>
+
+<p>Of course I had a look at the file, but there wasn't much to see because the content was encrypted.</p>
+
+<p>I had no idea whatsoever what Joe intended to do with that faked blockchain. Somehow it all seemed like preparing for a monumental prank. But as I was not able to come with a way to commit a crime with it either, I finally went to work.</p>
+
+<p>It started well. In the years since 2014 the code for real Monero had improved considerably, with much new functionality added, but already the original version had implemented a quite decent cryptocurrency, and I "decided" that our hypothetical Monero Dark had always used the original code: <em>Never change a running system</em> IT people use to quip.</p>
+
+<p>It took me only a few days to grab the old code and get it to run on modern versions of the Linux operating system instead of the now-ancient 2014 versions which in turn would not run well enough on modern PCs. It wasn't hard either to teach the software to make appropriate timestamps for all blocks and the transactions in them, as if the blocks really had been mined in the past, over many years, based on a fake clock that I let start in 2014 and advance much faster than real time.</p>
+
+<p>But soon I saw that I was severely lacking computing power: I had nearly 2 million alternative blocks to mine, and solving 2 million "puzzles" for them plus including a decent number of transactions in each block would take years with the hardware I had at hand.</p>
+
+<p>I asked Joe for money to buy a bunch of computers and started to figure out where to put them all in my not-so-big apartment, but he told me to wait, he would have a surprise solution for me.</p>
+
+<p>A few days later I received a big and heavy parcel. Content: 4 so-called <em>ASICs</em>, special-purpose hardware with exactly one capability, mine Monero at least a magnitude faster than normal general-purpose computers. They were not usable anymore for the real Monero because the puzzles to solve had been changed, so to say, to get rid of those ASICs because they were deemed not healthy for the Monero "ecosystem".</p>
+
+<p>That was a long story that fortunately did not worry me one bit because - maybe you guess it - mystical Monero Dark had always been running on the original mining code and still did today. Convenient, isn't it!</p>
+
+<p>And thus already a few weeks later I was able to complete my fake Monero Dark blockchain.</p>
+
+<p>I was quite proud about it. Only a quite close inspection would reveal that it couldn't possibly be the result of running a real cryptocurrency for some years. Ok, I had re-used the same 10 or so Monero addresses for the transactions over and over, and with a cryptocurrency like Bitcoin everybody would be able to notice that right away, but fortunately Monero is a so-called <em>privacy coin</em> that does not show addresses in the clear on the blockchain, and my simplification was invisible in the end result.</p>
+
+<p>I delivered it to Joe, got the agreed payment in Monero (real ones of course), and then started to wait: I was sure <em>something</em> would happen sooner or later, <em>somehow</em> involving my blockchain, I just had no idea <em>what</em>.</p>
+
+<p>It wasn't a long wait. The first thing that happened was a "leak": In a post on the biggest Internet forum about Monero, the Monero subreddit, somebody complained they had downloaded a blockchain in order to start using Monero, but it was too small and got rejected by the latest Monero software release. </p>
+
+<p>As the post included a link to the file in question people picked it up and saw pretty soon that it wasn't an incomplete version of the Monero blockchain, but something much stranger. And of course they found that one special transaction in the first differing block, the one with the big encrypted attachment - both block and transaction were practically shouting "Look at me!".</p>
+
+<p>Somebody noticed what I had overlooked earlier: The attachment was encrypted alright, but with a curiously weak key, one that a group of people combining their computing power could break by <em>brute force</em>, meaning trying every possible key one after the other until hitting the correct one.</p>
+
+<p>A bunch of Monero redditors with too much time on their hands and intrigued by the mystery blockchain formed a team and went to work. A few days later they had the decryption, and all hell started to break loose: It was a text where somebody claimed to be a time traveler.</p>
+
+<p>The author called himself <em>thankful_for_yesterday</em> and said he had traveled from the year 2030 back to 2014, and as proof of his travel had inserted this document into the Monero blockchain. That wasn't a bad place at all, given that blockchains of cryptocurrencies are something very valuable and, in principle at least, live eternally, beside being almost perfectly protected against tampering, except in extreme cases like 51% attacks ...</p>
+
+<p>What made the document a proof that somebody <em>from the future</em> had written it and not just somebody back in 2014 making a prank? It contained the price of Monero expressed in USD for every year from 2014 up to 2030, with one price every quarter. And guess what - all prices up to the latest quarter were <em>correct</em>!</p>
+
+<p>But it was the price for the quarter immediately ahead that got the most attention: It showed that Monero would rise to almost double its current price over the course of a few short months.</p>
+
+<p>Discussion raged back and forth, and this time well beyond the small circles of Monero enthusiasts. As obviously there was no Monero coin with that blockchain, some people said that it must be fake and in no way a proof for a time-travel. Other people countered with the question who would be crazy enough to construct gigabytes of fake but plausible-looking blocks.</p>
+
+<p>Then some science-fiction fan who had read a fair share of time-travel stories came up with an "explanation" of sorts: The blockchain was from real Monero, but a Monero on another <em>timeline</em>. The inclusion of the block containing the time traveler's document had somehow forced the universe into another timeline, the one where that other Monero lived and accumulated the alternate blockchain - until today, when all the recent events had somehow forced said universe back to the timeline as it would have happened without the time traveler.</p>
+
+<p>Or so ... I readily admit that I could not fully follow his fascinating speculations, especially the explanation how the Monero blockchain from the other timeline had survived all those switches. I soon got a headache thinking about different timelines, pasts, and futures.</p>
+
+<p>Judging from tweets and posts all over the Internet quite a lot of people bought the time travel and switching universes story. As a consequence they also believed the high Monero price in the coming quarter to be <em>fully correct</em>. Other people in turn were convinced that this was pure nonsense but speculated very early on that there would be droves of gullible believers.</p>
+
+<p>It came as it had to: Soon both those groups went out and started to buy Monero with both hands. Which of course, like a self-fulfilling prophecy, made the price rise substantially. The famous <em>time traveler rally</em> took off!</p>
+
+<p>Just when it nearly reached the foretold high price, before the next quarter even started, things started to fall apart because somebody <em>sold</em> massive amounts of Monero until the market could not take it anymore, causing the price to crash back more or less to where it had started.</p>
+
+<p>Monero was pretty volatile for a few more months, and people continued to analyze my fake blockchain and develop theories about time travels and alternate timelines, but over time most people lost interest.</p>
+
+<p>The end of this story for me personally were a large unexpected Monero payment coming in plus an e-mail from Joe explaining that this was my success bonus. He also made some confessions: Of course it had been him who had leaked my fake blockchain to the public on purpose. That science-fiction fan that made the time traveler story more plausible for many people with a clever explanation? Also him.</p>
+
+<p>And most importantly: Who had bought tons of cheap Monero and then sold them for a much higher price into the time traveler rally? Joe of course. He had nearly doubled his money in the biggest and most sophisticated <em>pump and dump</em> action that the cryptocurrency space has ever seen.</p>
+
+<p>I still have one of those CryptoNight ASICs that I used to construct the fake blockchain, I kept it as a souvenir. And each time when I look at it I am little annoyed that I wasn't unable to come up with that time traveler scheme myself ...</p>
+</body>
+</html>
+
