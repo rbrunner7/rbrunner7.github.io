@@ -1,0 +1,50 @@
+<html>
+<head>
+<title>"Consensus" - A Monero Fiction Short Story</title>
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; width: 70em; line-height: 120%;}
+hr {width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+
+<h1 id="buildtheguiwalletwindowsinstaller">Build the GUI Wallet Windows Installer</h1>
+
+<p>You find here detailed instructions how you can build the latest version of the Windows installer for the GUI wallet, i.e. for the official 0.14.1.0 release, and then help to prove (or disprove) whether those builds are really <strong>reproducible</strong>: Does everybody arrive at a bit-for-bit identical installer .exe file with the method described here?</p>
+
+<p>If that's the case in principle everybody could personally check whether the installer that will be offered for download on the official getmonero.org website is really what it pretends to be, and more importantly, this would open up the possibility of a group of people building and publishing future versions of the installer together, eliminating a currently existing bottleneck in this process.</p>
+
+<p>No programming experience should be needed for going through the following steps.</p>
+
+<p>Note that if you have some antivirus program running it may complain about "malware", "unwanted programs", even about "trojans" when you download and/or unzip the files indicated below. These are <strong>false positives</strong>: None of the files really contain anything harmful. For some background info about this problem see e.g. <a href="https://github.com/monero-project/monero-gui/issues/1747">here</a> or <a href="https://www.reddit.com/r/Monero/comments/a1247w/trojan_in_gui/">here</a>.</p>
+
+<p>If that happens the easiest way would be to disable the real-time scanning of your antivirus software altogether during the test. As a less drastic measure you could also define scanning exceptions for all the directories you download und unzip any related files into. If anything of this worries you best not to go further and refrain from doing this test.</p>
+
+<p>The steps in detail:</p>
+
+<ul>
+<li>Take a PC running any version of Windows. Windows 7 and any Windows 10 edition are fine. Language does not matter. (At least that's one of the claims.) Bonus points for taking any server version of Windows, e.g. Windows Server 2019 (because untested so far).</li>
+
+<li>Download and install the latest stable release 6.0.2 of <em>Inno Setup</em>, the tool used to build the installer, from the <a href="http://www.jrsoftware.org/isdl.php">official download page</a>. It's important that everybody uses the <strong>same</strong> version: Different version, different result.</li>
+
+<li>Download and unzip the installer script file plus some additional files needed for building the installer: <a href="https://rbrunner7.github.io/GUI_Installer_1410_Files.zip">https://rbrunner7.github.io/GUI<em>Installer</em>1410_Files.zip</a>. It does not matter where in your file system you unzip this; just take note of the location of the empty <code>bin</code> subdirectory that gets unzipped together with those files.</li>
+
+<li>Download the zip file for the latest 0.14.1.0 release of the Monero GUI wallet for Windows 64 bit, from the <a href="https://web.getmonero.org/downloads/">getmonero.org download page</a>.</li>
+
+<li>Unzip it and move all the files into the mentioned empty <code>bin</code> subdirectory. Important: Those unzipped files must go <strong>directly</strong> into <code>bin</code>, not into some sub-sub-directory. Your <code>bin</code> directory should directly contain <strong>17 files</strong> with a total of 361'750'750 bytes.</li>
+
+<li>Second possible pitfall: Make sure file dates came out correctly. Most files should have a file modification date of 2019-06-14. If you are on Windows 7 <strong>do not</strong> use the GUI's interactive ZIP folder extract because that will not preserve file dates; use a tool like 7zip on Windows 7. A single wrong file date (or a single wrong file), and your installer will already be different.</li>
+
+<li>Start the Inno Setup Compiler. Load the file <code>Monero.iss</code> that you find among the installer files. Compile it (command <em>Compile</em> in the <em>Build</em> menu). You will get a new file <code>mysetup.exe</code> in the <code>Output</code> subdirectory of the build files directory: That's the desired Windows installer. (If you ran that it would indeed install the GUI wallet.)</li>
+
+<li>Calculate the <strong>SHA256 hash</strong> of that <code>mysetup.exe</code> file. There are several ways to do so, e.g. with the tool <a href="http://code.kliu.org/hashcheck/">Hash Check</a>. You find more such tools e.g. by googling for "windows 10 calculate sha256".</li>
+
+<li>Publish this hash to allow other people to compare their results with yours.</li>
+</ul>
+</body>
+</html>
