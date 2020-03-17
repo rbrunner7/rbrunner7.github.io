@@ -4,17 +4,19 @@ What we call here *multiuser transactions* are transactions that contain outputs
 
 We would like to motion for two things:
 
-First, implement multiuser transactions and make them available as integral part of some of the next larger Monero releases, or with the hardfork that follows their implementation if necessary.
+First, let's get multiuser transactions implemented and available as integral part of some of the next larger Monero releases, or with the hardfork that follows their implementation if necessary.
 
-Second, commit to treating multiuser transactions as a feature that Monero will keep available long-term if reasonably possible. This means taking care that some form of them continues to work even after a switch away from current RingCT to a different protocol like Triptych.
+Second, let's commit to treating multiuser transactions as a feature that Monero will keep available long-term if reasonably possible. This means taking care that some form of them continues to work even after a switch away from current RingCT to a different protocol like Triptych.
 
 Such transactions can serve as a "building block" of trade protocols for marketplaces that work with moderation in one form or another, like e.g. Bisq and OpenBazaar, using the rather useful form of coordination they make possible: Alice and Bob can be sure that both their funds will move **at the same time**, or not at all if nobody submits the transaction.
 
 Marketplaces, decentralized exchanges and similar services may turn out to be very important parts of the future cryptocurrency ecosystem. With multisuser transactions as a reliable tool in Monero's "toolbox", assured to be available long-term, at least some of those services could run with Monero instead of Bitcoin or Ethereum as their foundation.
 
-An initiative to make them available could profit from significant work already done in this area:
+We, a group of Monero devs, are seriously interested in bringing Monero forward in this regard, and should this motion get traction we are ready to contribute time and work, especially on the first part of getting multiuser transactions implemented. In fact, we already did some preliminary work on this.
 
-Core dev "moneromooo" implemented a multiuser transaction scheme called *MoJoin* (or something very similar) during spring 2019, until near completion it seems. See [this commit](https://github.com/moneromooo-monero/bitmonero/commit/746824408715ea3e623f9818d6bccb455fe8df7a) on their own GitHub repository.
+A project to make them available could profit significantly from earlier efforts:
+
+Core dev "moneromooo" implemented a multiuser transaction scheme called *MoJoin* (or something very similar) during spring 2019, until near completion it seems. (We will soon know more about this.) See [this commit](https://github.com/moneromooo-monero/bitmonero/commit/746824408715ea3e623f9818d6bccb455fe8df7a) on their own GitHub repository.
 
 Recently "koe" / "UkoeHB" proposed an improved scheme called *TxTangle* in chapter 11 of the second edition of *Zero to Monero* (current draft [see here](https://www.pdf-archive.com/2020/03/04/zerotomoneromaster-v1-1-0/zerotomoneromaster-v1-1-0.pdf)).
 
