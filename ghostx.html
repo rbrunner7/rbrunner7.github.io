@@ -1,0 +1,110 @@
+<html>
+<head>
+<title>"GhostX" - A Monero Fiction Short Story</title>
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; width: 70em; line-height: 120%;}
+hr {width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+<h1 id="ghostx">GhostX</h1>
+
+<p>Something was wrong in the little world of the Monero cryptocurrency.</p>
+
+<p>Monero is a so-called "proof-of-work" coin. For a simplified, non-technical explanation imagine thousands of people around the world letting their computers run a special program called a "miner" that is able to solve something like devilishly complicated mathematical puzzles. With Monero there is a new puzzle every two minutes on average, and whoever solves one first pockets some Monero as a quite handsome reward.</p>
+
+<p>So what was wrong? After a long period of stability the total computing power directed at the Monero network had been rising steadily over the last 3 months and was now about 50% higher than the longtime average. Either a lot more computers than before were running Monero miners now, or something new was running out there that was much better at solving the puzzles. Trouble was: There were no clear indications for either possibility; the rising so-called "hashrate" was a mystery.</p>
+
+<p>The network reacted to this as it was designed to do: It made the required puzzles harder to solve. This rise of the so-called "difficulty" was the mechanism to keep that two-minute average waiting time between solutions appearing.</p>
+
+<p>Earlier in Monero's history some companies had been able to build single-purpose machines called "ASICs" that with comparable hardware costs were dozens of times faster at mining Monero than anything that the broad public had at hand. The resulting imbalances were dangerous for the secure functioning of Monero as a currency, and so a quite clever new type of puzzles was introduced to make building such ASICs as hard as possible.</p>
+
+<p>The underlying technology is called "RandomX". The basic approach: Define something like a "fantasy" CPU with an invented instruction set. Monero puzzles become programs for that virtual CPU, and mining basically means executing those programs as fast as possible. The "real" CPU in your desktop computer or notebook is able to simulate the RandomX CPU quite easily.</p>
+
+<p>The assumption was that nobody would be able to build a device that was markedly faster than existing consumer CPUs at the job, as that would mean to beat industry heavyweights like Intel in the field of their core competency to a incredible degree: Nobody builds CPUs that are many times faster than what is on the market just like that, with whatever instruction set.</p>
+
+<p>That's why RandomX had stood the test of time - until now.</p>
+
+<p>There was a second remarkable thing that had happened over the same 3 months in the little world of Monero mining, which of course was very suspicious, but despite numerous attempts nobody had been able to connect any dots: A new miner called "GhostX" had appeared and pushed the established ones aside because it was faster and thus more profitable.</p>
+
+<p>The initial version, roughly 5% faster than the competition, had not yet convinced many people. GhostX was a so-called "closed source" program which meant that people had to trust its anonymous creators to be honest and not let the program secretly mine for themselves during a fraction of the total run time. Few people were ready to take that risk for the promise of a merely 5% bigger payout, as most other miners were "open source" and allowed people to check themselves everything was right with them.</p>
+
+<p>Things began to change a little later when a second version of the miner was a quite surprising 10% faster, but still most people stuck to their tried-and-trusted programs. They only started to migrate in droves when GhostX 3.0 finally offered a crushing 15% speed advantage over everything else.</p>
+
+<p>The RandomX creators and other mining specialists found all this quite puzzling and unnerving. Some of them could imagine that clever code optimizations were able to achieve such a speedup, but the whole thing strained credibility big time. Unfortunately so far nobody had been able to directly "look inside" the program to find out how it was done because it was encrypted.</p>
+
+<p>That was the point when I decided to try my luck, despite being quite a newbie in mining technologies and RandomX. You never know without trying, blind chicken and all!</p>
+
+<p>Alright. If something was not right with GhostX, what would it be? As already mentioned: It would probably do what people called "stealing hashes", meaning secretly diverting some percentage of the results to its creators. Like only working 80% of total run time for the owner of the computer, with 20% of all mining revenue leaking out.</p>
+
+<p>Such diverting of results should be visible as some extra data transfers, going secretly out from the miner to its masters. So I installed a network traffic analysis tool alongside GhostX and started to look out for anything suspicious. After seeing nothing in this direction for hours I finally became aware of a difficulty:</p>
+
+<p>A miner normally transmits dozens of results per second to the connected pool server, despite almost all those results not being correct solutions of the puzzle at hand, just to prove to all fellow co-miners that it was indeed doing its work and thus was entitled to a share of the spoils should anybody within the group of miners find a solution.</p>
+
+<p>This would not matter for a cheating GhostX however; no need to prove to its creators it was honestly doing its work! Just transmitting correct solutions would be enough, and for each individual instance of a miner this would mean waiting weeks on average until it hit the jackpot with a correct result and transmitted a single packet to some suspicious destination.</p>
+
+<p>Well, waiting for this to happen did not work, obviously.</p>
+
+<p>It took me a few days to come up with a solution. I set up a fake mining pool and connected GhostX to that. The miner got to hear the following good news: "You won't believe it, today the difficulty on the network is very, very low, the puzzles to solve are really a piece of cake. Quick, try your luck!"</p>
+
+<p>The trick worked: It seemed the creators of GhostX had not foreseen it, and while running with the wrong assumption of a ridiculously low difficulty my instance indeed transmitted numerous packets to a second IP number, bypassing the mining pool.</p>
+
+<p>With this result in hand it was time for me to recruit the help of my colleague Paul. He is a computer security professional and dissects sophisticated trojans and viruses to learn how to detect and defeat them even before breakfast. Maybe he would be able to find out something about the owner of the IP number, and more importantly crack the miner's encryption to look inside.</p>
+
+<p>While I waited for results from him I started to wonder. I was quite sure that the "public" part of GhostX in itself had to play fair, more or less: All those GhostX instances correctly solved puzzles and earned Monero for their operators. Anything wrong in this regard would get noticed pretty soon.</p>
+
+<p>But how could this leave any worthwhile amount of results to divert to its creators? Wouldn't this mean that the true computing power of this miner was even higher than the visible and already very remarkable 115%?</p>
+
+<p>So I calculated an estimate based on the results from my fake low-difficulty mining pool, assuming each secretly outgoing packet was a correct puzzle solution. I was in for a shock: Overall it must be over two times faster than all the rest!</p>
+
+<p>I had no idea whatsoever how on earth that could be possible. But I realized that with so much raw power at hand it had been easy to drive up the visible performance of GhostX to whatever level necessary to get people to switch: Only adjust the ratio between open and hidden mining until people bite, done.</p>
+
+<p>"There is some heavy anti-inspection technology at work in that miner" Paul reported back a few days later. "In fact, I never saw something like this. Maybe I will make GhostX the subject of my next talk at the Black Hat conference."</p>
+
+<p>"But I was also incredibly lucky. A program ran amok on my computer and gobbled up all available memory while GhostX was starting. Exactly after it had finished decrypting itself but before it could order the operating system to keep it in RAM at all times to protect itself against analysis, it got swapped out to disk where I could have a free look at its code in the clear."</p>
+
+<p>"And you won't believe what I learned from this! Recent Intel CPUs implement a second instruction set. A full freaking new instruction set is hiding inside there, without anybody being aware as far as I can tell. Implemented in microcode and thus with the full power of the CPU at its disposition to execute instructions, like virtual memory management, caches and all that. Unavailable and invisible until a program authenticates and unlocks its use using a cryptographical key, that's why it's impossible to just stumble over it."</p>
+
+<p>"Hmmm, cool. But what is now the connection between this and GhostX mining Monero?" I asked back, dumbfounded.</p>
+
+<p>"GhostX contains and uses that key. And try harder, you really should be able to guess what that instruction set is!"</p>
+
+<p>"Ah. Of course. RandomX."</p>
+
+<p>"Exactly. These CPUs can execute RandomX instructions natively, without any time-consuming emulation layer like conventional miners are forced to implement and use. I did not benchmark, but I estimate that mining using native RandomX instructions more than doubles the speed, even if you include everything else like jumping in and out of RandomX mode, network overhead and so on."</p>
+
+<p>"And there really is room for all this additional stuff in the microcode memory?" I asked.</p>
+
+<p>"Yes. Those ROMs are pretty big nowadays, and RandomX instructions are not that complicated if you have the full machinery inside a modern CPU to use to implement them."</p>
+
+<p>"Interesting. But this must be an inside job, right? Only people from the core microcode team deep inside Intel can pull off such a stunt."</p>
+
+<p>Paul agreed. "Certainly. And you also need quite some patience, to wait until enough of those CPUs found their way into computers all over the world. By the way, I have a hunch why they call their miner GhostX. That additional instruction set is like a ghost in the machine."</p>
+
+<p>So here it was finally, the solution to the mystery what was secretly mining Monero with almost half the computing power of all other miners combined: GhostX instances, using Intel CPUs like some kind of RandomX ASICs. The Monero community would freak out when this became public.</p>
+
+<p>I remembered the IP number that GhostX used to "phone home" and asked Paul about it.</p>
+
+<p>"Ah yes, of course" he replied. "That IP number alone does not tell much: It belongs to a small cloud server company in the US. But never mind: Some technician there owed me a big favor because I once saved his ass by finding a trojan in their internal network that he had unwittingly installed with a careless click himself. He revealed to me that somebody from Intel rents the particular computer in question."</p>
+
+<p>Which of course was no surprise anymore, but a nice confirmation.</p>
+
+<p>"Please, let me brag a little about cracking GhostX to the authors before you make everything public" Paul asked me. I saw no reason why not, and so we placed a message to them in the biggest online GhostX discussion forum where they would surely notice it, especially because we did not put it there as plaintext, but encrypted with the same key GhostX used to unlock the RandomX instruction set when mining.</p>
+
+<p>We did not have to wait long for an answer, which contained a surprising offer: 20% of all revenue that resulted from stealth Monero mining by GhostX for me and Paul in exchange to keeping quiet and letting the whole endeavor continue to run.</p>
+
+<p>I confess that I was quite tempted to go along after a quick estimate had shown that this amounted to some serious money flow, and Paul told me he wouldn't probably lose too much sleep either after taking the offer.</p>
+
+<p>But then something happened that more or less forced our hand: Yet another miner surfaced. It called itself "GhostXBuster" and was 5% faster still than the latest GhostX version. We knew what this meant: Somebody else had managed to crack open the miner and also used the ghost in the machine that the Intel microcode team hat put in there.</p>
+
+<p>This was getting out of hand fast and simply too dangerous for Monero. I decided to silently contact the Monero Core Team to reveal everything, so that the next major Monero version could change the RandomX instruction set to make "native" mining on Intel CPUs impossible and level the playing field for everybody again.</p>
+
+<p>So at the end Paul and I did not get rich from all this, but we received a handsome bounty from the Monero Vulnerability Disclosure Program, which was nice.</p>
+</body>
+</html>
+
