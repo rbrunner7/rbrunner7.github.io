@@ -63,7 +63,7 @@ pre {overflow: auto; color:blue; padding-left: 20px;}
 
 <p>I recruited David, a friend of mine and experienced computer security specialist, for helping me solving the riddle.</p>
 
-<p>"The data traffic of the app looks absolutely clean" he reported back after some initial investigations. "I watched all transfers going in and out, from installation onwards, and never saw the software doing anything else than talking to Monero daemons to get blockchain access and submit transactions."</p>
+<p>"The data traffic of the app looks absolutely clean" he reported back after some initial investigations. "I watched all transfers going in and out, from installation onward, and never saw the software doing anything else than talking to Monero daemons to get blockchain access and submit transactions."</p>
 
 <p>"But anyway, we don't have reports of coin thefts, we have the problem of duplicate keys, so looking for secret keys leaving devices is probably not promising anyway, right?"</p>
 
@@ -79,13 +79,13 @@ pre {overflow: auto; color:blue; padding-left: 20px;}
 
 <p>A simple example to illustrate: Use the phone number of the smartphone as secret key for the first wallet. For every additional wallet, append some digits more to that number and count them up. As phone numbers are reasonably unique, each smartphone would create its own distinct wallets.</p>
 
-<p>You as the thief use a program that goes through all possible phone numbers, turns each of them into a Monero wallet in the same way and checks for coins present. If there are any, put aside the number for that fateful day sometime in the future when you do what is called an "exit scam": Rob all those people on the same day, leaving them almost no time to warn each other, and then retire on some beautiful Carribian island.</p>
+<p>You as the thief use a program that goes through all possible phone numbers, turns each of them into a Monero wallet in the same way and checks for coins present. If there are any, put aside the number for that fateful day sometime in the future when you do what is called an "exit scam": Rob all those people on the same day, leaving them almost no time to warn each other, and then retire on some beautiful Caribbean island.</p>
 
 <p>Do you see the elegance of this approach? Impossible to catch any Rich Wallet app doing some suspicious data transfer that could betray it, because there simply are no such transfers in the first place.</p>
 
 <p>What if the apps would keep quiet and wait with their key sending until exit scam day? Wasn't such a strategy almost as good? We would say no, because with knowing the keys beforehand you also catch all users not running Rich Wallet on that day, plus there are no key-receiving servers that somebody could shoot down on pretty quick notice.</p>
 
-<p>Our idea even accounted for the reported key collision problem: That would be rare instances where the approach to keep secret keys unique broke down somehow. In the phone number example, imagine somebody giving up their phone number while still having coins in a wallet connected to it, the phone number getting assigned to another person extraordinarly quickly, with that person again creating a Monero wallet.</p>
+<p>Our idea even accounted for the reported key collision problem: That would be rare instances where the approach to keep secret keys unique broke down somehow. In the phone number example, imagine somebody giving up their phone number while still having coins in a wallet connected to it, the phone number getting assigned to another person extraordinarily quickly, with that person again creating a Monero wallet.</p>
 
 <p>So we were quite proud of our idea, until David failed to come up with a feasible way to realize it in a smartphone app.</p>
 
