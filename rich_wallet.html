@@ -1,0 +1,155 @@
+<html>
+<head>
+<title>"Rich Wallet" - A Monero Fiction Short Story</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; max-width: 70em; line-height: 120%;}
+hr {max-width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+<h1 id="richwallet">Rich Wallet</h1>
+
+<p>Finally you want to make your feet wet: Enough reading about the wonderful new world of cryptocurrencies, it's time for action. So you choose a currency, download its software, and create a new wallet, because you understand that's the "thing" you need to hold and later spend your "coins". Looking at the wallet's "address" you get curious and want to know how that came to be. You learn that you got a random one: Your wallet software rolled some dice, so to speak, and that's the result.</p>
+
+<p>You could now let it be and happily start to use your wallet, but a new question starts to burn in your mind: If I got some random address, isn't it possible that by sheer chance somebody else gets exactly the same? Which could end very badly because that person could easily steal my precious coins?</p>
+
+<p>The answer is "yes". Yes, that's possible.</p>
+
+<p>Of course this does not help one bit to calm your nerves, and immediately leads to yet another question: Why isn't this a big problem?</p>
+
+<p>The answer is basically the same as the answer to the question why the heck you are still not rich from winning the lottery after years of trying: Like those lottery number combinations there are a lot of possible different wallets. And I do mean a lot. So many that you don't have to worry: The chance of somebody getting the same wallet like you is astronomically small.</p>
+
+<p>At which point you can decide to simply believe this random guy here and entrust your hard-earned money to a cryptocurrency wallet already, or you can go deeper into the rabbit hole and ask: How small?</p>
+
+<p>If your choice happened to be my favorite cryptocurrency Monero, the story goes like this: At the heart of a Monero wallet there is a secret key. That key is just a very big number, chosen at random as already mentioned. I find it somehow quite fascinating that the cryptography used here works with any number up to a given maximum; it doesn't have to satisfy special conditions like being a prime number, the product of two prime numbers, or anything such. Come up with any long sequence of digits: Chances are good you could use the resulting number as the secret key for your wallet!</p>
+
+<p>Scientists once put some serious effort into an estimate for the total number of grains of sand on this planet Earth. Their result was 7.5*10^18, or written out: 7,500,000,000,000,000,000.</p>
+
+<p>So if the number of possible Monero wallets was like that, imagine yourself being teleported to a random place in the world where there is some sand, picking up a single grain of it at random, putting it back, and then asking yourself how probable it might be that anybody else will ever pick up exactly the same grain.</p>
+
+<p>If you like that little story and find it reassuring, I can tell you now that it has a serious problem: The number of possible Monero wallets absolutely dwarfs the number of sand grains. It's estimated that the known and observable universe contains between 10^77 and 10^82 atoms, whereas there are roughly 10^77 possible Monero secret keys. Yes: There could be a Monero wallet for each and every atom in the whole universe.</p>
+
+<hr />
+
+<p>A few weeks ago a new smartphone wallet software for Monero called "Rich Wallet" had burst onto the scene and was gaining new users in a rapid pace ever since. Mostly responsible for this success was their user acquisition strategy: Every new user got the equivalent of about one USD in XMR for simply installing the software and creating a first wallet.</p>
+
+<p>The anonymous people behind Rich Wallet Inc. seemed to have deep pockets. Originally their welcome offer was limited to the first 100,000 users, but later got extended to 500,000 which helped them become the most installed smartphone wallet for Monero yet, a remarkable feat for a newcomer.</p>
+
+<p>They didn't even seriously try to prevent people from cheating and pocketing the welcome bonus multiple times.</p>
+
+<p>Their claiming procedure raised quite a few eyebrows initially: You had to instruct the program to display a QR code containing the address of the first created Monero wallet, make a photo of the code with another device, and mail the photo to them. Shortly afterwards the bounty arrived in your wallet as a normal Monero transaction.</p>
+
+<p>But this actually made sense, from a security point of view. With the wallet software directly transmitting the wallet address over the Internet to some company server you as a user could never be sure that the outgoing data didn't include the wallet's secret key as well, allowing Rich Wallet Inc. to steal all your XMR later on.</p>
+
+<p>With the QR code you could trivially check yourself that the wallet merely displayed the 95 characters of your wallet's main address in a machine-readable form, and nothing else.</p>
+
+<p>Trust always is a very acute issue with cryptocurrency wallets. There had been actual cases of malicious wallet apps for various coins including Monero, secretly sending out keys sooner or later, leading to thefts.</p>
+
+<p>As gaining initial trust is always difficult for newcomers without any history yet, Rich Wallet's demonstrably safe bounty payout procedure was a quite clever move in this regard.</p>
+
+<hr />
+
+<p>After I finished my daily morning routine of reading new posts on the Monero subreddit I decided that enough was enough. Today I had seen maybe the 5th or 6th report of somebody having a very strange problem with the Rich Wallet app. All those users were absolutely baffled to create a new wallet and finding it not empty, but already containing some coins and a history of transactions done.</p>
+
+<p>Finding your way around a cryptocurrency as a newbie isn't easy, and people make all kinds of mistakes all the time when starting the career as "their own bank". But this was something else: You couldn't possibly push any wrong buttons when creating a new wallet, even as a bloody beginner. Finding coins in "new" wallets meant Rich Wallet created duplicate secret keys, which you understand after my "atoms in the universe" story as clearly impossible by pure chance to this degree.</p>
+
+<p>Something was up, and I wanted to know what.</p>
+
+<p>I recruited David, a friend of mine and experienced computer security specialist, for helping me solving the riddle.</p>
+
+<p>"The data traffic of the app looks absolutely clean" he reported back after some initial investigations. "I watched all transfers going in and out, from installation onwards, and never saw the software doing anything else than talking to Monero daemons to get blockchain access and submit transactions."</p>
+
+<p>"But anyway, we don't have reports of coin thefts, we have the problem of duplicate keys, so looking for secret keys leaving devices is probably not promising anyway, right?"</p>
+
+<p>I had to agree. "Yes, of course, but lacking any hot lead so far, we had to check this."</p>
+
+<p>"What about bounty claiming however? I know of course those QR codes to photograph really only contain a Monero address and nothing else. But there is also some logo and artwork displayed on the screen around the codes; maybe something is hidden in there?"</p>
+
+<p>"You mean steganography?" David asked back. "Every instance of the app displaying a slightly different logo, with some pixels altered, using those to transfer out keys without anybody noticing? I can't imagine that's feasible. A Monero secret key is 256 bits of info, as you know, and we simply don't have enough pixels there to encode that without the logo getting ugly. Problems with picture quality when scanning later not even considered."</p>
+
+<p>No quick success then.</p>
+
+<p>Over the course of the next few days David and I brainstormed a possible approach of coin stealing without the need to steal secret keys first: You had to find a way to make those secret keys predictable. You needed a so-called "deterministic" process for key generation.</p>
+
+<p>A simple example to illustrate: Use the phone number of the smartphone as secret key for the first wallet. For every additional wallet, append some digits more to that number and count them up. As phone numbers are reasonably unique, each smartphone would create its own distinct wallets.</p>
+
+<p>You as the thief use a program that goes through all possible phone numbers, turns each of them into a Monero wallet in the same way and checks for coins present. If there are any, put aside the number for that fateful day sometime in the future when you do what is called an "exit scam": Rob all those people on the same day, leaving them almost no time to warn each other, and then retire on some beautiful Carribian island.</p>
+
+<p>Do you see the elegance of this approach? Impossible to catch any Rich Wallet app doing some suspicious data transfer that could betray it, because there simply are no such transfers in the first place.</p>
+
+<p>What if the apps would keep quiet and wait with their key sending until exit scam day? Wasn't such a strategy almost as good? We would say no, because with knowing the keys beforehand you also catch all users not running Rich Wallet on that day, plus there are no key-receiving servers that somebody could shoot down on pretty quick notice.</p>
+
+<p>Our idea even accounted for the reported key collision problem: That would be rare instances where the approach to keep secret keys unique broke down somehow. In the phone number example, imagine somebody giving up their phone number while still having coins in a wallet connected to it, the phone number getting assigned to another person extraordinarly quickly, with that person again creating a Monero wallet.</p>
+
+<p>So we were quite proud of our idea, until David failed to come up with a feasible way to realize it in a smartphone app.</p>
+
+<p>Thing was, to pull it off, Rich Wallet would need access to some piece of info unique for each smartphone, plus knowable to the criminals, or at least guessable with reasonable effort, "just like that", without the need for any data transfer.</p>
+
+<p>"Unique ids for smartphones are problematic" David explained to me. "App writers abused them in the past to track users in various ways. That's why access to the phone number, the IMEI, the phone's serial number, or anything like it is off-limits nowadays to apps on every smartphone OS that counts."</p>
+
+<hr />
+
+<p>I was almost ready to give up when about two weeks later David announced a breakthrough.</p>
+
+<p>"I looked more closely at the way the app accesses Monero daemons to fetch data from the blockchain and noticed something strange when the first wallet gets created: Not only one daemon is contacted like you would expect, but two. And the second one is always the same. I tested with several phones."</p>
+
+<p>"Now the trick: For one of the block-fetching requests that daemon does not really return a block, but a simple number. And that number seems to count up for each Rich Wallet app contacting it while creating the very first wallet. A serial number, if you like."</p>
+
+<p>So that finally was the way those secret keys became unique and predictable!</p>
+
+<p>"Did you also find out how this fails in a small number of cases?" I asked David.</p>
+
+<p>"Not sure. I guess something like this: Error handling is incomplete, and if the app can't make contact with the special daemon for some reason, whatever untouched random value is contained in some variable gets used as serial, which by chance produces key clashes."</p>
+
+<p>I laughed. "Hey, I know that well. The bane of every C++ program: Uninitialized variables!"</p>
+
+<p>A little later David had also worked out how exactly secret keys were derived from serial numbers. It wasn't complicated; the programmers clearly had not considered anybody finding out all this and coming this far.</p>
+
+<p>I didn't immediately recognize the fact that now David and I, just like the people behind Rich Wallet, knew the secret keys of many thousands of Monero wallets.</p>
+
+<p>Time from more brainstorming how we could use this knowledge to somehow secure funds: First move them out of the reach of the bad guys, and second return them to the rightful owners.</p>
+
+<hr />
+
+<p>The day we executed the first step is known today in Monero history as "Getting Poor Day". It became a day with a new record number of Monero transactions processed: To give the criminals as little time as possible to transfer any funds out of the wallets themselves after becoming aware something was afoot, we submitted thousands of transactions to the network as fast as we could to empty them all.</p>
+
+<p>Could be we were lucky timezone-wise, with our opponents sleeping through most of the action. Or they simply did not pay much attention, expecting nothing like this to happen. Anyway, they only started to submit transactions of their own at the very end, and were faster than us for only a minuscule fraction of the funds.</p>
+
+<p>Monero is a so-called "privacy coin". One consequence of its privacy-preserving design: If somebody else uses your secret key to move your XMR, your wallet software is only able to show a transfer out with execution time and amount, but not the target address. To all those poor Rich Wallet users it looked like their coins had vanished into a black hole.</p>
+
+<p>Which, in a way, was not very far from the truth. It was like we had teleported those coins out into deep space, choosing a different place for each wallet, with only David and me having any info about where in the universe the XMR ended up.</p>
+
+<p>How we did that? We devised a non-obvious way to take a Rich Wallet serial number, transform it into another number that was still unique, make a Monero secret key out of that, and then transfer to the corresponding address.</p>
+
+<hr />
+
+<p>For the second step we built a Monero wallet software of our own, proudly calling it "Monero Rescue Wallet". After installation on a smartphone alongside the Rich Wallet app it created a new wallet with a properly random key, fetched Rich Wallet's serial number on that particular device, used our "deep space" key derivation function to calculate the secret key necessary to bring the coins home, and submitted a transaction to the network to do exactly this.</p>
+
+<p>Here again time was of the essence, and before we released our rescue app, we carefully explained that in public. As soon as the criminals got hold of the app they could try to reverse-engineer it to learn how our secret key derivation scheme worked, and right after succeeding they would regain access to the coins and could start to move them to wallets under their own control.</p>
+
+<p>That never happened however, and every Rich Wallet user who cared enough to install our app got their XMR back, only minus the fees for two transactions.</p>
+
+<p>The day of the release of our wallet came to be known as "Rich Again Day".</p>
+
+<hr />
+
+<p>Somewhat later, with grass already starting to grow over the whole affair, David contacted me again.</p>
+
+<p>"Try to guess what rumor about Rich Wallet started to go around in computer security circles. About its true purpose, that is".</p>
+
+<p>I was perplexed. "You mean stealing as many coins as possible and turning them into villas on some nice islands wasn't its true purpose?"</p>
+
+<p>"Rumor says that, yes. Imagine that blunder with duplicate keys never happening, the two of use never getting into this, Rich Wallet taking over a big chunk of the market for Monero wallet software, and keeping it undisturbed for a long time."</p>
+
+<p>I thought about this and started to suspect something. "Well, the people behind it would learn for a significant fraction of all transactions the senders, the amounts, and even the receivers if those were again Rich Wallet users."</p>
+
+<p>"Exactly" confirmed David. "The whole thing was a clever and extensive attack against Monero's privacy."</p>
+</body>
+</html>
+
