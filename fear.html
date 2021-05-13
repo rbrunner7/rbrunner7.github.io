@@ -1,0 +1,184 @@
+<html>
+<head>
+<title>"Fear" - A Monero Fiction Short Story</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; max-width: 70em; line-height: 120%;}
+hr {max-width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+
+<h1 id="fear">Fear</h1>
+
+<p>Host: Welcome to the "15 years of Monero" anniversary edition of our podcast. Today we have a guest who is a member of the Monero community for a long time - he only missed the first 3 years of those 15 - and therefore has many stories to tell. Please welcome rbrunner7!</p>
+
+<p>rbrunner7: Thanks. It's a pleasure to be here.</p>
+
+<p>Host: What made you stay that long with Monero? What interests you most?</p>
+
+<p>rbrunner7: Almost from the start certain psychological aspects of the cryptocurrency fascinated me. Like the most basic thing about it, how exactly it gained value. I even wrote fiction stories about those things!</p>
+
+<p>Host: So today you will tell us about an episode in Monero's history that you were involved with, an episode which is especially interesting from a psychological point of view, right?</p>
+
+<p>rbrunner7: Yes. As nowadays everybody with a minimum of interest in cryptocurrencies knows, Monero completely hides transaction amounts, which is a good thing and indeed Monero's main difference and advantage over a lot of other coins. But this feature also almost inevitably evokes a specific fear in many people. And that fear once became something like a vulnerability that got exploited for an attack.</p>
+
+<hr />
+
+<p>In Wall Street trader circles they were known as the "two Daves" as they both happened to have the same given name of Dave. They were sitting in a bar and celebrating their latest stock market coup that had brought in a tad under ten million USD. They specialized in betting on falling share prices with the help of options and short-selling. Many a company coming into their crosshairs had seen its valuation halving, and their trader colleagues jokingly spoke of companies getting "double-daved".</p>
+
+<p>Somehow surprising how many of those companies saw dirty internal secrets come to light that spooked the stock market and made their share prices sink considerably only days after the two Daves opening a large position. Or how some of them had to fight convincing-sounding rumors that equally depressed their share prices, with the Daves almost always managing to sell their short contracts or put options at a handsome profit before the companies could put the rumors to rest. But well, nobody had ever caught them in the act ...</p>
+
+<p>"We should try something else for a change. Shorting companies gets boring, and scaring shareholders into panic-selling is almost too easy nowadays." said Dave 1.</p>
+
+<p>"What do you see as alternative?" asked Dave 2.</p>
+
+<p>"Cryptocurrencies. Of course not Bitcoin, that's too big for us to move. Something smaller but still valuable and liquid enough, some of the larger 'altcoins'".</p>
+
+<p>"Interesting. Do you already have one in mind?"</p>
+
+<p>"I do, yes" confirmed Dave 1. "It's called 'Monero'. I propose that one because its programmers and its users are sitting on an awfully high horse after some recent successes of their coin. Somehow I would love to see them falling. And of course because I found something where we can grab them psychologically."</p>
+
+<p>"Ah, I see you have already smelled blood! What is their favorite fear?" asked Dave 2.</p>
+
+<p>"A so-called 'inflation bug'. Somebody finding a way to create millions of coins out of thin air, using some loophole in the math they use, or a bug in their software. And if you ask me, people being afraid about that have a point. Monero is what they call a 'privacy coin': Nobody can see who pays whom how much, that's perfectly hidden. How can you ever be really sure nobody is cheating?"</p>
+
+<p>Dave 2 was thinking it over before answering: "Sounds good, and like something we can work with. But can you short a cryptocurrency?"</p>
+
+<p>"Yeah, it seems you can, on certain exchanges. But I am not sure the necessary liquidity will be there. Maybe better to just beat down the price by scaring holders, buy low, reveal the fears as unfounded, wait for the price bounce-back, profit!"</p>
+
+<p>"That's how I like it!" Dave 2 laughed. "So how much are we ready to invest into this project?"</p>
+
+<p>"Hmmm, I think the price will go much lower if we also actively manipulate it down on the most important exchanges. That may be expensive, but our profit much bigger in the end. I would be ready to put the whole win from our last venture on the line here."</p>
+
+<p>"The whole 10 million? Heck, why not."</p>
+
+<p>Dave 1 nodded. "Deal. I already earmarked the first 50,000 dollars for going to some brilliant but underpaid and underworked cryptographer. He will write a very convincing scholarly paper for us about a grave weakness in Monero."</p>
+
+<p>"There is such a weakness?"</p>
+
+<p>Dave 1 smiled. "What do you think?"</p>
+
+<hr />
+
+<p>Have you ever wondered how you can perfectly hide the amounts of Monero transactions from everybody except the rightful receiver on the one hand, and on the other hand still allow outsiders to verify in a sure way that no coins ever get created "out of thin air"?</p>
+
+<p>A Monero transaction consists of 1 or more "inputs", providing the XMR to spend, and 1 or more "outputs" sending those XMR to some addresses. (The inputs are of course nothing else than the outputs of earlier transactions.)</p>
+
+<p>For everything to work out correctly the sum of the inputs and the sum of the outputs must always be identical. Or, expressed a little more "mathematically", sum of inputs minus sum of outputs must equal exactly zero: No coins lost, and more importantly no new coins created.</p>
+
+<p>There is a second, much less obvious condition that must hold: Negative outputs are forbidden. Otherwise you could, e.g. with inputs to spend at hand for 1 XMR, construct a transaction to yourself with 2 outputs, one for plus 100,000 XMR and a second one for minus 99,999 XMR. The sum is correct, but as you can simply forevermore ignore the negative output, you suddenly have 100,000 XMR to spend!</p>
+
+<p>For proving that input and output amounts match Monero uses a mathematical construct called "Pedersen commitment", and to prove that no negative output values are present a second construct called "Bulletproof".</p>
+
+<p>Both constructs use an approach that is called "zero-knowledge proof", or "ZKP" for short. Pedersen commitments and Bulletproofs both prove things about the amounts in Monero transactions, but without revealing the amounts as numbers of XMR themselves. You as a "verifier" will learn that inputs minus outputs is 0 and that negative values are avoided but gain zero knowledge beyond that.</p>
+
+<p>For us non-cryptographers that sure sounds hard to believe, maybe even like an unsolvable paradox, but interestingly there are a number of real-life examples that demonstrate the approach in an easy-to-understand manner, which can go a long way towards building trust that the sophisticated math wizardry protecting Monero really works.</p>
+
+<p>I will present you my favorite real-life ZKP:</p>
+
+<p>In 1987 the British illustrator Martin Handford published a children's puzzle book called "Where's Wally?", localized to "Where's Waldo?" in North America. The task is to find the character called Wally, wearing a red-and-white-striped shirt, bobble hat and glasses, in large illustrations with dozens of other people doing various amusing things. The large number of details, including things like red-and-white-striped bath towels to confuse you, makes finding Wally challenging and fun.</p>
+
+<p>Now say I want to prove to you that I found Wally in a particular picture, but without revealing Wally's location within that picture to you. Do you see the similarity to a ZKP? I prove to you I know something without giving you a chance to learn that something itself so you will gain zero additional knowledge.</p>
+
+<p>Sounds impossible? Well, consider this:</p>
+
+<p>I prepare a large piece of cardboard with a hole in the middle that is just large enough to show the depiction of Wally in the picture at hand. I position the cardboard over the picture in the right way while you can't watch me, and then call you to verify that indeed Wally is visible through the hole.</p>
+
+<p>Final detail to make things perfect: The cardboard is big enough to completely cover the picture so you don't get hints about Wally's location by looking at any still visible parts of the picture.</p>
+
+<p>I take away the cardboard again, and if you can't watch me doing that, at the end you will have gained zero knowledge except the fact that I indeed found Wally.</p>
+
+<hr />
+
+<p>Official Statement of the MRL (Monero Research Lab) Regarding "The Paper"</p>
+
+<p>About two weeks ago a paper titled "Faking zero knowledge range proofs without solving the elliptic curve discrete logarithm problem", commonly simply called "the paper" by the Monero community, was published on a preprint server. It has gotten considerable attention because of its obvious relevance for the Monero cryptocurrency, as such a proof is at the heart of its protocol, protecting against transactions that create XMR "out of thin air" using negative outputs.</p>
+
+<p>Because this has caused a great deal of anxiety and many rumors we would like to inform everybody about the current stance of the MRL regarding the paper and how we intend to proceed in this matter.</p>
+
+<p>We can confirm that the author is working in the field of cryptology successfully for quite some time already and has published a number of well-respected earlier papers. Because of this we take the current one very seriously.</p>
+
+<p>Analysis however has turned out to be difficult. The author develops some kind of new arithmetic in it that is hard to understand because of its complex and novel nature. We are not yet able to judge whether the basic claim, that this arithmetic allows the development of algorithms that can efficiently fake range proofs and thus "break" Monero, might be true or not.</p>
+
+<p>It's therefore unfortunately too early to tell how relevant this paper is for Monero and whether a protocol modification will be needed in the future. We ask the community for patience while we continue to work full time on the analysis and will report as soon as any important new insights are available.</p>
+
+<p>Thank you.</p>
+
+<hr />
+
+<p>For a number of years already there is a nice tool available on the Reddit social media website: the Monero Tips Bot. It connects Monero wallets with Reddit user names and allows you to tip some Moneroj to any user by including a special command in your answer to  a comment. The bot manages wallets on behalf of users in the background and thus technically could steal coins, but as this is only meant for tipping small amounts you probably won't fund your wallet with large sums anyway.</p>
+
+<p>People therefore were quite astonished to see a tip happen for over a thousand USD in XMR. It went to the author of a post that didn't seem to merit a tip, and certainly not such a large one, because it was just one more rehash of the often-asked question "How can we audit the supply of Monero?", expressing fears that somebody may find a way to invent millions of XMR without anybody knowing before it's too late.</p>
+
+<p>Almost immediately people started to speculate: What do we have here? Somebody spending a serious amount of XMR just for fun, as an answer to a post about the fear somebody somewhere could be busy producing serious amounts of XMR just like that, right now? Connect the dots! Someone sure is screwing with us here!</p>
+
+<p>Speculation intensified when the mysterious tipper went back in post history and every day made a tip of a similar size to earlier posts dealing with the same subject. The limit of one tip per day sure looked like designed for maximum effect, like some Chinese water torture, but after a week or so many people became quite nervous nevertheless.</p>
+
+<hr />
+
+<p>Host: So I guess after the publication of "the paper" and additional little pinpricks like the 1000 dollar tips on Reddit things slowly started to boil over?</p>
+
+<p>rbrunner7: You can say that. The price of XMR on exchanges had started to go down. There were also signs that somebody tried to systematically depress the price there and was eating serious losses while doing so. The longer this went on, the more the dive accelerated.</p>
+
+<p>Host: Something had to be done.</p>
+
+<p>rbrunner7: Indeed. Fortunately the people behind all this, the "two Daves", had interviewed a Monero dev to learn more about the technology and the community while preparing their attacks, and had inadvertently spilled the beans about what they intended to do. That dev in turn informed the Monero core team and us other devs, and we finally had a secret online meeting discussing our possibilities that I still remember vividly.</p>
+
+<p>Host: Interesting. Tell us more.</p>
+
+<p>rbrunner7: We knew it wouldn't be promising to go directly against the two Daves, e.g. by involving the police, given that we held no solid proofs. We had to fight back ourselves to stop their attacks, and ideally also somehow prevent them from profiting.</p>
+
+<p>Host: You decided to go for a quite risky strategy to achieve that.</p>
+
+<p>rbrunner7: Exactly. We turned their own weapon - fear - against them.</p>
+
+<hr />
+
+<p>Beside the main Monero network that the broad public uses for making payments there is another much smaller special-purpose Monero network called "testnet". As the name hints at it is mainly used by programmers to test new Monero features or new software interfacing with the network. Although testnet coins are worth nothing, all the rules that govern Monero transactions are enforced as strictly as on "mainnet". After all, if you could cheat testing would not make much sense.</p>
+
+<p>Some people are running so-called "faucets" for testnet, websites where you can enter your testnet Monero address into a form and have some XMR sent to you. This quickly solves the problem that without coins your possibilities to test something are of course quite limited.</p>
+
+<p>One such faucet had its 15 minutes of fame when somebody paid XMR into it, and its website displayed the following message afterwards: "We currently have about 4,012,153 testnet XMR to distribute".</p>
+
+<p>The next day the person running it made a Reddit post about the event and shared the "view public key" for the faucet's wallet which technically allowed outsiders to check incoming transactions. Everybody with some good knowledge about Monero's tools could then see it directly for themselves: A single transaction with a value of over 4 million XMR.</p>
+
+<p>Of course even 4 million testnet XMR are worth nothing. That was not the point. Point was, that amounted to almost one fourth of all existing testnet coins, transferred in one transaction. Somehow it was very hard to believe that a single person would have legitimate control over such a massive stash of coins. Many people quickly became convinced that there was something wrong with that transaction: If anybody of them needed more confirmation after the publication of "the paper" that the sky was falling for Monero, this was it.</p>
+
+<p>It certainly did not help at all that on the very same day the Monero Tips Bot story also went into overdrive. Each one of the now quite numerous posts about a possible Monero inflation bug got rewarded with a tip of an astonishing 10,000 USD in XMR.</p>
+
+<p>And as tip of the iceberg a PR appeared on the Monero GitHub, a proposal for code modifications submitted by Monero's most prolific and most respected dev "moneromooo". It wasn't clear what exactly the modifications did, but it was not hard at all to see which parts of the code were affected: the code for those crucial range proofs, the Bulletproofs. Shortly afterwards a second PR appeared that seemed to prepare an unscheduled emergency hardfork, a switch of the Monero network to a slightly different protocol that forced all participants to upgrade their software. You really don't do such a hardfork without a damned good reason.</p>
+
+<hr />
+
+<p>Host: So these additional events strongly hinting at an inflation bug, that wasn't the two Daves anymore, that was the Monero dev community hitting back?</p>
+
+<p>rbrunner7: Yes. We managed to put up quite a show for them. Of course it also scared a lot of other people, but we risked that as temporary collateral damage.</p>
+
+<p>Host: And it worked.</p>
+
+<p>rbrunner7: Fortunately. We learned from the dev in contact with the two Daves that they were convinced now they had hit the truth by pure chance, and had dropped Monero like a hot potato. We got also indirect confirmation because the obvious price manipulations on the exchanges had stopped.</p>
+
+<p>Host: It was explained afterwards in detail how all these feats where accomplished when the whole story was revealed to the Monero community and faith got slowly restored. But for the benefit of people who were "not there", can you summarize?</p>
+
+<p>rbrunner7: Sure. The monster tips on Reddit were simply fake, nobody needed to spend any XMR there. We made them in cooperation with the author of the bot who "doctored" it for us. The submitted Bulletproof code modifications were also kind of fake, clever code re-arrangements without any real effect, with some long-planned optimizations thrown in so that wasn't too obvious. And certainly no emergency hardfork would ever take place.</p>
+
+<p>Host: And the 4 million XMR testnet transaction? That must have been real, no way to fake it.</p>
+
+<p>rbrunner7: Ah, I am proud about that one because it was me who came up with it. I remembered that Fluffypony once reported on IRC how he had mined testnet essentially alone for years and amassed a veritable fortune in testnet XMR that way. After getting him on board it was just a question of systematically consolidating thousands and thousands of block reward outputs he owned into a single really massive one. It took days, but fortunately the Daves where not clever enough to notice the very unusual number of transactions on testnet during this!</p>
+
+<p>Host: Fascinating. Before we conclude this very interesting anniversary episode, any closing words?</p>
+
+<p>rbrunner7: The attack of the two Daves showed the importance of taking the fears of people seriously. The way to go for me was, and still is, to educate people in order to strengthen trust and confidence in Monero's advanced privacy technology. And yes, even writing funny short stories can help a bit here!</p>
+
+<p>Host: Thank you for visiting us.</p>
+
+<p>rbrunner7: A pleasure.</p>
+</body>
+</html>
+
