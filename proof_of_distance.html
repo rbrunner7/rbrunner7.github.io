@@ -1,0 +1,130 @@
+<html>
+<head>
+<title>"Proof of Distance" - A Monero Science Fiction Short Story</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; max-width: 70em; line-height: 120%;}
+hr {max-width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+
+<h1>Proof of Distance</h1>
+
+<p>I did not yet know what interesting journey would start when Jason contacted me for the first time about a year ago.</p>
+
+<p>"Hey there, rbrunner7! You write those science fiction stories about Monero, and from them I know that you like to think ahead, and to think big. You could be the right man to help with something that is also looking into a possible Monero future. Interested?"</p>
+
+<p>My answer was a bit cautious because I was well aware that not every person that was drawn to Monero was automatically worth spending time and effort for: "Might be. Can you tell me a little more? I will treat all info as confidential if you want."</p>
+
+<p>"Alright. I want to work on extensions for Monero that make it suitable for multi-planetary use. Imagine: Monero, the first cryptocurrency ready to follow mankind exploring and colonizing the solar system!"</p>
+
+<p>That did sound fascinating, so I decided to give this person some credit and continue the conversation for now: "Wow, you really aim high! Will be interesting to see what you come up with. But what would be my role?"</p>
+
+<p>"Basically anything you like and have time for. I will certainly need something like a sparring partner, somebody I can run my ideas by to check them before I go public with things that totally don't work and I make a fool out of myself. And if you want to go further and work out some concepts together with me, I am ready to share the glory."</p>
+
+<p>"OK. Count me in for the time being, and come back to me when you have the first things ready to check together."</p>
+
+<hr />
+
+<p>A few days later Jason was back and laid out what he had so far:</p>
+
+<p>"It seems pretty clear that Mars will be the first planet to get colonized, so to get concrete let's ask what it would mean to make a Monero transaction while being there and having to pay for something on the spot. Your private Mars buggy needs a new battery, and XMR is a payment option. So what do you do now, standing in that battery shop?"</p>
+
+<p>"It seems reasonable to assume that we have constant radio contact with Earth that can carry a Monero transaction from Mars to Earth where the Monero network is running, and a way to send new blocks from Earth to Mars so we can keep a daemon synced there."</p>
+
+<p>"The distance between Earth and Mars varies all the time. At minimum distance light and radio signals need a little more than 3 minutes to travel between the two planets, at maximum distance a little more than 22 minutes. It's probably best to use the average for our concept work, which means about 12.5 minutes."</p>
+
+<p>"So you prepare a Monero transaction on Mars, send it to Earth for mining it into a block, and wait until you receive that block as confirmation that everything is okay. On average you will wait about 26 minutes until confirmation: 25 minutes signal travel time, and half the usual Monero block time of two minutes until the transaction gets mined."</p>
+
+<p>"Frankly, this does not sound too bad to me, and right now I doubt whether Monero, interplanetary edition, needs any new mechanisms at all."</p>
+
+<p>I was sceptic. "You mean waiting 26 minutes on average before you can leave the shop with your new battery is acceptable?"</p>
+
+<p>Jason confirmed: "I think so, yes, given that there will be many things taking longer than they would on Earth, or being more complicated. People will tolerate."</p>
+
+<p>I still was not ready to agree. "Well, Mars with 26 minutes may be doable, but later people will expand further out, into the asteroid belt and beyond. Your delay problem will become progressively worse over time."</p>
+
+<p>"And then consider that Monero will probably be in competition with traditional banking that also follows people to Mars. Bank of America and Mars Corp., Olympus Mons branch, offering accounts right there on Mars. And credit cards of course. With the magic of trusted third parties you are able to pay your battery right away. How will Monero ever compete if it has a waiting time of 26 minutes?"</p>
+
+<p>It turned out Jason was prepared for this argument. "No need to worry. You know why? Because sooner or later the colonies on Mars will become big enough to run their own Monero Mars network, enabling you to have a local XMR balance. Of course technically that will be a second cryptocurrency running in parallel with Monero here on Earth, with no direct equivalence of the coins. But surely it will be easy to set up some swap service between those two Moneros. In case you run low on Mars coins but still have a lot of Earth coins you just swap some of those in, and that process taking 26 minutes once a week or so really is no problem anymore."</p>
+
+<p>I had to admit Jason got a point there. "Yeah, your own Monero network on Mars takes away most of the fun."</p>
+
+<p>"What fun do you mean?"</p>
+
+<p>"The fun of designing some interesting new mechanisms for an interplanetary Monero! No, seriously, I still think it would be worthwhile to investigate ways to deal with the delay somehow without resorting to local Monero forks."</p>
+
+<p>"Agreed."</p>
+
+<hr />
+
+<p>Already on the next day Jason came back with fresh ideas.</p>
+
+<p>"Put yourself into the shoes of the battery dealer we had in our scenario; I take the part of the buyer. You see me sending out a transaction for enough XMR to pay the battery. Right at this moment, what exactly is needed for you to become reasonably sure payment will eventually arrive, so you can risk to hand me the battery immediately?"</p>
+
+<p>"The only real risk for you not easy to mitigate that I found is a scam that goes like this: My brother Adam on Earth also has my private keys and thus control over my coins. I tell him beforehand when exactly I will send out my transaction to pay the battery. Now, a little after that, but well before my transaction reaches Earth, Adam submits an identical transaction. The execution of that one will turn my transaction into a double spend attempt: It will fail because the XMR are already spent."</p>
+
+<p>"Result: You have one battery less but don't receive XMR for it, and until you notice that I am already far away, with 26 minutes of head start."</p>
+
+<p>"Now the interesting question: How can we make this scam impossible to pull through? In principle it seems to be this: We need Monero coins, or more technically spoken transaction outputs, that you can only spend while being on Mars, but not while being on Earth."</p>
+
+<p>"I christened this approach 'proof of distance': When my Monero wallet constructs the transaction, it only uses outputs that are locked that way to Mars, and then appends some additional data that proves that this all indeed takes place on Mars, the data being of course the proof of distance from Earth. Any transaction that does not carry a valid such proof won't get executed later on Earth but rejected. Thus Adam won't be able to spend the coins for the battery earlier: His wallet, because running down here, can't construct the necessary proof."</p>
+
+<p>I was intrigued, but not yet convinced: "That sounds pretty interesting as general approach, but also somehow impossible. Admit it, you don't have the slightest idea yet how to construct a proof with such fantastic properties, right?"</p>
+
+<p>"Yeah, but I have a gut feeling that I am onto something here. Stay tuned!"</p>
+
+<hr />
+
+<p>Most stars shine with a pretty constant brightness. The so-called "luminosity" of the nearest star, the Sun, only fluctuates within a range of about 0.1%, and quite slowly, mostly depending on how many sun spots there currently are on its surface.</p>
+
+<p>There are stars with a much more variable brightness. Most of those have regular and predictable luminosity changes, with various periods. But a small minority of stars change their brightness in irregular ways. You could say those are celestial random generators: From their brightness right now you will never know in advance what happens next, whether it will rise or fall - or stay constant for a while.</p>
+
+<p>Now imagine you are sitting on Mars and watch such a star that is more or less in the opposite direction of Earth, as seen from Mars. The light of that star reaches you minutes earlier than it reaches any observer on Earth. So if there is an exceptionally brisk change in brightness, you will know about it at a point in time where people down here can't possibly know yet. And that's a hard and uncompromising fact based on physics, with absolutely no way around it as far as we know.</p>
+
+<p>Also assume that somebody on Mars offers a trusted time source: If you have some data, that service can create a signature for it that is impossible to fake and that contains the exact date and time when the signature was made. Data and signature have an indestructible link, if you change either the data or the signature in any way it's guaranteed the whole assembly gets invalid.</p>
+
+<p>Your Monero transaction with proof of distance goes like this: "This transaction was made when the irregular-brightness star at stellar coordinates x,y,z as seen from Mars changed from magnitude 7.0 to 7.1 over the course of the minute ending on 2035-05-03 15:10:00 Mars Universal Time. See the attached signature from the Valles Marineris trusted time service to verify the integrity of the transaction plus magnitude change data and the time it was recorded. This is a valid proof of distance because at that exact time only somebody far away from Earth could have possibly known already about that particular brightness change."</p>
+
+<p>Monero daemons on Earth can later, with access to a database with records of luminosity changes of stars, verify the proof and execute the transaction if it is valid.</p>
+
+<p>Presto - you have Monero transactions that you can only construct if you are far away from Earth!</p>
+
+<p>There is at least one philosophical problem however. One of the most prominent and exceptional features of cryptocurrencies like Monero is that they are "trustless". You don't have to trust anybody involved to do "the right thing", everything is set up in a way that makes it impossible for all involved parties not to behave, regardless of their intentions. As much as people would want to spend their coins twice, they can't. As as much as people would like to rewrite blocks in the blockchain to make their coins unspent again, they can't.</p>
+
+<p>That's why the trusted time source there signing transactions on Mars doesn't really fit. The problem is of course the word "trusted". If the operators of the time source don't feel like doing the right thing anymore and start to sign transactions with wrong timestamps to make illegal transactions look legit there is not much you can do. You have to trust them to stay honest, and that's far from ideal.</p>
+
+<hr />
+
+<p>When I described my star brightness change scheme to Jason he answered: "Ah, I see we were thinking along quite similar lines! And I already like that name, 'proof of distance'. But I think I can do better than you. I propose a system that does not need a trusted time source: It's based on alpha radiation."</p>
+
+<p>"As you probably know the word 'radiation' may give a wrong impression, as it's not about 'true' radiation like light or radio waves, but about particles: helium atoms, or more exact their cores without electrons, that typically travel through space with a few percents of the speed of light. There are various sources scattered over the whole sky that emit alpha radiation of varying intensity and duration."</p>
+
+<p>"My transaction has the following data attached as proof: This transaction was constructed right after a strong alpha radiation burst of intensity A had reached Mars from stellar coordinates x,y,z"</p>
+
+<p>"Now the trick: The transaction plus proof, transmitted by radio to Earth, will arrive much earlier than the described alpha radiation burst because the latter travels much more slowly. After receiving my transaction the Monero daemons of Earth can wait and see whether the described burst really arrives later on, at the expected time. If it does, the transaction gets confirmed."</p>
+
+<p>"At its core it's the same principle: Only somebody far away from Earth in the right direction could have seen that burst streaming through the solar system so early. The difference of course is that no trusted third party is needed, thanks to the delay in Earth arrival time."</p>
+
+<p>I agreed with Jason that this seemed a better approach regarding trust. However it was still unclear to us whether useful alpha radiation bursts were frequent enough for the scheme to work. And the slow speed of typical alpha radiation made the transaction confirmation time jump to 3 hours or so, which of course was not ideal. Add to this the unfortunate fact that alpha radiation does not reach the surface of the Earth, as it gets absorbed by the atmosphere: You have to be in space, e.g. using an Earth-orbiting satellite, to detect and measure it.</p>
+
+<p>Furthermore it wasn't clear yet how to organize star brightness measurements and alpha radiation burst detection in a way that was as trustless as possible: You really wouldn't want a third-party to lie and just invent luminosity changes or bursts, for example.</p>
+
+<p>But we were on the way, and making progress.</p>
+
+<hr />
+
+<p>It's the year 2028. The first fully privately-financed Mars rover "Only Slightly Bent" touches down on the Mars surface a few minutes after detaching from the orbiter "Ultimate Ship The Second". Its main job: Checking the terrain for future crewed SpaceX Mars landing missions.</p>
+
+<p>A few days later, as another premiere, the main on-board computer fires up a Monero daemon plus wallet app and constructs the first cryptocurrency transaction on another planet. It's experimental software that implements a proof of distance that Jason came up with a few years earlier.</p>
+
+<p>Of course this is mostly for publicity only, but still: Elon Musk liked the attempts of the Monero community to build an interplanetary coin so much that he has decided to make Monero the official cryptocurrency of SpaceX. There will be more to come.</p>
+</body>
+</html>
+
