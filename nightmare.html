@@ -1,0 +1,150 @@
+<html>
+<head>
+<title>"Nightmare" - A Monero Fiction Short Story</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; max-width: 70em; line-height: 120%;}
+hr {max-width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+
+<h1 id="nightmare">Nightmare</h1>
+
+<p>The first and still most known cryptocurrency today, Bitcoin, introduced a number of innovative and interesting features. Among them is the way to manage payments, called <em>transactions</em>, in a fully decentralized way: Behind the currency there is a network of thousands of so-called <em>nodes</em>, computers running Bitcoin software that talk to each other over the Internet to exchange, validate and record transactions together. The software is free, and no permission is needed: Basically everybody with a decent computer and an Internet connection can run a node.</p>
+
+<p>Monero, a cryptocurrency started a few years after Bitcoin, also works with such a network. The Monero nodes, for some nerdy reasons called <em>daemons</em>, talk to each other in a special way: They don't use one of the widely used protocols like HTTPS that browsers use to talk to WWW servers, but an obscure and proprietary protocol called <em>Levin</em>. Part of that protocol is a <em>signature</em>, a string of bytes that the daemons use to signal each other at the start of a conversation "You are correct here, I am also a daemon, you can talk to me because I will understand and answer you". Any server that does not give back a signature, or not the correct one after contacted will be ignored.</p>
+
+<p>It might be that the creator of the Levin protocol was a fan of <em>Futurama</em>, an American animated science fiction sitcom featuring a robot called <em>Bender</em> as one of the main characters. In one episode the robot has a nightmare where in a series of binary digits, 0's and 1's, suddenly something appears that is definitely wrong there: a digit 2.</p>
+
+<p>This robotic nightmare was turned into a signature: Monero daemons handshake using a sequence of eight bytes which when written as a hexadecimal number come out as 0101010101012101.</p>
+
+<hr />
+
+<p>During most of 2019 he was the secret ruler of the Monero network. He had over 5,000 special computing devices, so-called ASICs, running day and night. All those single-purpose machines were doing was "mining" Monero, solving something like awfully difficult mathematical riddles where each riddle solved before anybody else allowed to add a new block to the Monero blockchain for a reward of a little more than 2 XMR.</p>
+
+<p>The Monero network constantly self-adjusts to have a new block every two minutes on average. During 2019 you could exchange 1 XMR for at least 50 USD on cryptocurrency exchanges. As his ASICs were so much faster than anything other people had at hand to mine Monero they found more than half of all blocks every day, which meant that he earned something like 40,000 USD daily, over a million bucks each month.</p>
+
+<p>Of course first he had financed the development of the machines and their manufacturing all on his own, and that had been expensive and risky. But he was ahead now, and basically only the electricity bill ate a small part of that monthly 40,000 dollar windfall, the rest was pure, sweet and even tax-free profit.</p>
+
+<p>Although the people developing the Monero software never found out who he was, they knew very well his machines were there, from watching what happened with those blocks. They saw his fleet of ASICs as the biggest current danger for Monero because more than half of total mining power under the control of a single entity allowed for a special attack on the network called <em>51% attack</em>. And they wanted a cryptocurrency where basically everybody with a fast CPU had a chance to take part in mining, to make it democratic and keep it decentralized.</p>
+
+<p>To achieve those goals they had invented a new kind of "riddle" called <em>RandomX</em>, and when those went into service on 2019-11-30 18:57:47 UTC with block 1978433, all those wonderful money-making ASICs turned into useless electronic waste, never again producing a single dollar of mining profit.</p>
+
+<p>It was a sudden and deep fall for the secret ruler of the Monero network. He swore to himself to rise to power again. That would not be with mining again, as RandomX was cleverly designed to make profitable ASICs more or less impossible, but he would find a way.</p>
+
+<hr />
+
+<p>My testnet daemon was behaving wonky which disturbed the debugging of the new feature I was currently implementing. After some analysis I found out that it saw a number of other daemons which produced errors every now and then which lead to frequent reconnects and refusals to talk further. It was like they did not speak the Levin protocol in a fully correct way.</p>
+
+<p>This was quite surprising in a way. The code implementing the protocol in Monero was very old, barely ever changed and was doing duty without problems for many years already.</p>
+
+<p>I was intrigued and watched those daemons more closely. Beside producing intermittent protocol errors they also behaved differently from my own daemon in subtle ways: They seemed to able to answer some types of queries faster, but were slower for a number of other queries.</p>
+
+<p>The most probable explanation for all this that I could come up after a while: Somebody had re-implemented a Monero daemon from scratch and was now in the process of weeding out bugs, using testnet instead of mainnet where hiccups did not matter that much.</p>
+
+<p>Which did not seem probable at all, frankly. Monero devs had wished for alternative daemon implementations for a long time. Other cryptocurrencies like Bitcoin and Ethereum had a number of different nodes which brought positive effects like more resilience of the network as a whole against bugs and better software because of friendly competition between the different teams.</p>
+
+<p>But rewriting the Monero daemon from the ground up was such a monumental undertaking that nobody had ever seriously tried. We probably speak about at least a full man year of work here, for somebody who is already pretty fluent with blockchains and competent regarding the daemon's functionality. Newcomers would have to add a couple of months of learning.</p>
+
+<hr />
+
+<p>Only 2 weeks later the fog cleared as an anonymous team of developers burst onto the scene with <em>Phoenix</em>, a fully functioning Monero daemon written in Rust, a more modern programming language than C++ as used by the "old" Monero software. It was fresh, clean code from top to bottom, written by clearly competent people.</p>
+
+<p>I had mixed feelings about this. Sure, a second node implementation was a net win, but the power dynamic in the Monero "ecosystem" would certainly change considerably now. For many years a group of 7 people, the Monero Core Team, had been the guardians of the Monero software and by extension of the Monero currency and network, trusted and respected by most people. Now there suddenly was a second team, also with considerable power in their hands thanks to Phoenix, with people that were new to the scene.</p>
+
+<p>In a way it was a little strange. The development up to full operational readiness had taken place in the dark, which was unusual for open source software. I also wondered why it looked as if not a single person in the Phoenix team had contributed to Monero earlier; the "usual suspects" were missing completely.</p>
+
+<hr />
+
+<p>Shortly afterwards Andrew, a colleague of mine also working on Monero, contacted me on IRC, clearly worried.</p>
+
+<p>"I come from a longer chat with a former Monero dev that managed to get hired into the Phoenix team a few months back without being recognized as such and is now secretly acting as a whistleblower. What they told me is quite worrying."</p>
+
+<p>"So you mean they actively avoid us?" I asked.</p>
+
+<p>Andrew confirmed. "Yes. They try to be fully independent and able to let us completely in the dark what they plan with their Phoenix daemon. And what they do plan, according to the whistleblower, is really strong stuff."</p>
+
+<p>I had to laugh. "You know as well as I do that everything regarding the Monero network is designed for maximum resilience, and has to be, with anybody able to set up Monero daemons, including our greatest enemies. What would we have to fear from them now?"</p>
+
+<p>"They plan nothing less than taking over the network and getting full control over Monero."</p>
+
+<p>"Ah yes? I already tremble."</p>
+
+<p>Andrew did not find that funny, apparently. "They will wait until the majority of the nodes in the network is running Phoenix instead of our software. Then one day they suddenly split the network in two and force people to take side if they want to continue to use Monero."</p>
+
+<p>I was skeptic. "You think just having the bigger net, with the higher number of active daemons, will be enough to lure people away from the software and the people they trusted for years?"</p>
+
+<p>"Yes. Daemon is also not daemon. The daemons running at important cryptocurrency exchanges and at big mining pools are in a way much more important than your and my daemons. And it seems they are busy to actively bribe those parties into switching over to Phoenix with money."</p>
+
+<p>That started to sound worrying.</p>
+
+<p>"I did not yet tell you the best detail from my chat with the whistleblower" Andrew added. "Phoenix, the bird that is reborn out of ashes, right? Remember the mysterious fleet of about 5000 ASICs that ruled the network in 2019 before we could get rid of them thanks to RandomX?"</p>
+
+<p>"Of course I do."</p>
+
+<p>"Good. The man that stands behind the Phoenix project, started it back in 2020 and financed it all the way, was the owner of those ASICs. He is still royally pissed about us taking away the network from him, so to speak. He wants it back, and Phoenix will be his tool."</p>
+
+<p>"Hmmm. Not good. Any details about how they intend to split the network?"</p>
+
+<p>"Bender's nightmare"</p>
+
+<p>I did not understand immediately. "The Levin signature?"</p>
+
+<p>"Exactly. They will switch their daemons over to 0101010101013101, or something similarly incompatible, which will result in an immediate split of the network into two distinct networks."</p>
+
+<p>I had to agree. "A nightmare indeed."</p>
+
+<hr />
+
+<p>A little later it dawned on us that the Phoenix daemons would need a second mechanism: a way to signal to each other when to initiate the split. Andrew and I discussed this and came to the conclusion that the way to go would be to use what is already there anyway. Monero daemons try hard to make sure that every new transaction gets known all over the network. With this you just have to find a way how to turn a transaction into a trigger. The simplest and also most robust way seemed to be to react to a transaction with a particular id popping up.</p>
+
+<p>After we found code in Phoenix doing exactly that, to not much surprise anymore, we came up with a plan: As soon as possible we would use the mechanism to cause a chain split ourselves, because until now only relatively few people were running the daemon, and the resulting damage for the network would stay limited. At the same time we would go public with detailed background info, hoping that all Phoenix daemons suddenly dropping out of the "true" Monero network would give credibility to our claims and demonstrate the urgency of the whole affair.</p>
+
+<p>There was a problem, however. A really monumental problem.</p>
+
+<p>Our enemy had surely taken the id hardwired in Phoenix from a transaction he had built a long time ago already and simply stored, until now never sent to the network for execution. We were pretty sure that this crucial transaction was carefully locked away and guarded, with nobody else having access, not even his team of programmers. There would be no point in asking the whistleblower to try to steal it for us.</p>
+
+<p>Monero transaction ids are monstrous numbers like 789e63f1d2a95c891642ef571e3d959c8bf4182e23ec3f3b38e629beac0338f7. They are derived from the bytes that make up the transactions in a process called <em>hashing</em> that only works in a forward way, meaning that with such long hashes there is no practical way to find a byte sequence that produces a particular given one.</p>
+
+<p>This meant that it was impossible for us create a second transaction with the same id.</p>
+
+<p>Was there a way to cheat somehow? We asked ourselves whether we could transmit an arbitrary transaction that merely claimed to have the magic id but quickly saw the problem with this idea: Monero daemons do not accept any transaction for processing and propagating it right away; first they do all kinds of tests on them to make sure they are valid. They would re-calculate the id from the bytes of the transaction, notice that the claimed id was wrong and simply throw the transaction away.</p>
+
+<p>Despite knowing exactly which id the Phoenix daemons were waiting for we did not have the slightest idea how we could use this knowledge in any successful way.</p>
+
+<hr />
+
+<p>The next day Andrew started the conversation on IRC with a single exclamation: "Victory!"</p>
+
+<p>"How so?"</p>
+
+<p>I could almost feel his excitement radiating over the Internet. "There is a bug."</p>
+
+<p>"Come on, spit it out!"</p>
+
+<p>"Out of pure despair I decided to submit an invalid transaction under the trigger id to a Phoenix daemon anyway. I almost fell from my chair when it reacted to it. Instead of fully ignoring everything and doing nothing it checks the id somewhere."</p>
+
+<p>"Ha! That sounds exactly like the kind of dumb bug that all of us produce every now and then :)"</p>
+
+<p>"Yes, that. Or somebody with a sudden guilty conscience has secretly weakened the mechanism on purpose as far as they could without others in the team noticing, as a kind of sabotage."</p>
+
+<p>"Whatever, does not matter. But wait, we still can't get the network to broadcast an invalid transaction, can we? How will we be able to profit from the bug?"</p>
+
+<p>"Glad you ask. I am already working on this. We don't need any daemons. I hack together a program that speaks the Levin protocol and is just clever enough to find all daemons in the network and directly present each of them our trigger id transaction.".</p>
+
+<p>"Genius :)"</p>
+
+<hr />
+
+<p>The day everything exploded into the public became known as <em>Bender's Revenge</em>. And the whole story even got a happy end: Some trustworthy Monero devs took Phoenix out of the hands of our enemy by "forking" the code and publishing their own version, and since then they keep it current and compatible with the "old" Monero daemon. Thus we not only defeated "Mr. Monero ASICs" a second time, we also gained something very valuable by doing so, an alternative node implementation.</p>
+
+<p>I am just wondering whether this is the true end of the story, or whether he is already cooking up something else ...</p>
+</body>
+</html>
+
