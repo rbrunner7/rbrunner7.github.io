@@ -1,0 +1,69 @@
+<html>
+<head>
+<title>Wallet APIs, Seraphis and Jamtis</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; max-width: 70em; line-height: 120%;}
+hr {width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+<h1 id="walletapisseraphisandjamtis">Wallet APIs, Seraphis and Jamtis</h1>
+
+<p>I asked myself the question: How could we best manage and adapt the programming of Monero wallet apps like the CLI wallet, the GUI wallet, smartphone wallets like Monerujo and Cake Wallet, and others, in the light of the coming switch to Seraphis and Jamtis? (For more background info check <a href="https://github.com/monero-project/monero/issues/8157">this</a> issue on the Monero GitHub.)</p>
+
+<p>I document here the current state of my brainstorming about that question. It's all very early, very open, not meant to champion already a particular approach, not meant to push anybody anyway from or towards doing something. It is meant to provide a starting point to start the discussion.</p>
+
+<p>I use the term <em>API</em> here: The interface that the Monero core software offers to wallet app devs to handle the actual wallets. For most Monero wallets today that API basically consists of the C++ header file <code>wallet2.h</code>: Doing operations on a wallet means calling different methods that are defined there.</p>
+
+<p>One thing seems to be sure already: It won't be possible to support Seraphis and Jamtis with a fully unmodified <code>wallet2.h</code> because of various differences in the way wallets will work. Nobody has worked out yet a clear list of all the points that will have to change, however.</p>
+
+<p>UkoeHB, the cryptographer that created Seraphis, is currently implementing code to handle Seraphis wallets, as a "proof of concept" and to show "how it's done". When designing that he did not care about <code>wallet2.h</code> nor about <code>wallet2.cpp</code> but started with a clean slate, out on a "green field" so to say. This code is labelled <em>seraphis_wallet</em> in the following graphic.</p>
+
+<p>As APIs go you probably can't say that <code>wallet2.h</code> is particularly well designed, with a consistent naming, consistent method parameters and fields of structures, a nice grouping of methods according to purpose, and so on. It's therefore not unreasonable to brainstorm about using the big Seraphis and Jamtis switch as an opportunity to introduce a new and better wallet programming API, carefully designed as such, and also designed with additional changes in the future in mind.</p>
+
+<p>Note that I don't talk here about the implementation, about <code>wallet2.cpp</code>. That would be interesting as well of course, but any changes there or even a complete replacement of that code file by something else would probably not influence wallet programming much. I want to put the primary focus on interfaces here, in an attempt to make the transition of wallet apps as easy as possible: "No Wallet Left Behind", as I called it in the linked GitHub issue.</p>
+
+<p>When thinking about Monero's future wallet API on a high level of abstraction I was able to come up with only 3 general approaches that I tried to illustrate on the following graphic:</p>
+
+<img src="seraphis_wallet.png" width="1312" height="901">
+
+<p>I will now give some key info about each of those approaches, their probable advantages, and possible disadvantages.</p>
+
+<h2 id="wallet2plus">wallet2 plus</h2>
+
+<p>The approach called <em>wallet2 plus</em> is an attempt to keep the current API <code>wallet2.h</code> as intact as possible and make only changes there that are really necessary to support Seraphis and Jamtis, which hopefully won't be too drastic and numerous.</p>
+
+<p>Possible advantages are low effort needed to modify wallet apps to the resulting interface, and no learning of a brand new interface.</p>
+
+<p>Possible disadvantages are a further degradation of the quality and consistency of the API, and a wasted opportunity to go a level higher there.</p>
+
+<p>It's not clear at all how you would implement this API - note the <em>Code?</em> with a question mark in the graphic. Supporting Seraphis and Jamtis will need substantial amounts of new code, and the monolithic <code>wallet2.cpp</code> file is too big for comfort already today: IMHO we really should not stuff new code in there to the tune of many hundreds of lines.</p>
+
+<h2 id="doublewallet">double wallet</h2>
+
+<p>The approach called <em>double wallet</em> means that the Monero dev team does not offer a single API able to work before and after the hardfork to Seraphis and Jamtis and able to support both "old" and "new" wallets, but offers two distinct interfaces by leaving <code>wallet2.h</code> unmodified and adding a new Seraphis-specific interface.</p>
+
+<p>How to deal with those is left to the wallet app writers. Their reaction might be to not attempt to offer a single app that seamlessly continues to work through the hardfork, but to build a new app, e.g. <em>Monerujo Seraphis</em>, that will start to work on the day of the hardfork and will merely be able to import "old" wallet files.</p>
+
+<p>Possible advantages are lower implementation effort for Monero devs because no common layer needs writing, and a nice new API.</p>
+
+<p>Possible disadvantages are more effort for wallet devs, and a less smooth transition for wallet end users.</p>
+
+<h2 id="wallet3">wallet3</h2>
+
+<p>The approach called <em>wallet3</em> is probably the most ambitious of the three, and also the one with the least certainty whether it is really feasible.</p>
+
+<p>The basic idea behind it is the following: Come up as soon as possible with a new "nice" wallet API with a working title of <em>wallet3</em> that is able to support both "old" and "new" wallets. Right next implement a first version of that API that encapsulates <code>wallet2</code> which is left as unmodified as possible in both definition and implementation, but of course immediately relegated to "deprecated" as soon as that first version is running.</p>
+
+<p>Possible advantages: Wallet devs could start with preparing for the hardfork and for the transition to Seraphis and Jamtis early which may shorten the waiting time overall until the hardfork can take place and may diminishing the danger of large delays, basically because migrating the wallets and fully developing Seraphis and Jamtis to production readiness can take place in parallel to some extent. Plus Monero gets a new, shiny wallet API.</p>
+
+<p>Possible disadvantages: Any software not getting a timely rewrite to use the new API will stop to work at the day of the hardfork and might have a hard time to quickly reconnect, given that the <code>wallet3</code> API might have considerably differences to <code>wallet2.h</code>.</p>
+</body>
+</html>
+
