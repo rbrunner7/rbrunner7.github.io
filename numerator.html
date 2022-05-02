@@ -1,0 +1,161 @@
+<html>
+<head>
+<title>"Numerator" - A Monero Fiction Short Story</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style type="text/css">
+<!--
+body {padding: 20px;}
+p, ul {font-size:1em; font-family: Arial, Helvetica, sans-serif; max-width: 70em; line-height: 120%;}
+hr {max-width: 70em; margin-left: 0;}
+code {font-size:1.2em; color:blue}
+pre {overflow: auto; color:blue; padding-left: 20px;}
+-->
+</style>
+</head>
+<body>
+
+<h1 id="numerator">Numerator</h1>
+
+<p>You probably know that the heart of your computer or smartphone, the part where the "magic" happens, is the CPU. But did you ever wonder what that microchip is really doing if you look "deep down" through all the layers of the graphical user interface, the programs and the apps, even the operating system itself?</p>
+
+<p>The lowest level that is still normally accessible software is called <em>machine code</em>. It consists of <em>instructions</em> where each single one is doing something very simple like adding two numbers or checking whether one number is bigger than the other. A modern CPU executes many millions of instructions per second which then together do something useful. They are encoded on the level of bytes; if your typical Intel or AMD CPU sees a byte e.g. with a value of 64, it will take that as an order to increment a number by 1.</p>
+
+<p>Not all CPUs exist as physical chips that power real devices. People have invented "virtual" CPUs with own instruction sets for various reasons, and then went on to implement them in software running on a "real" CPU.</p>
+
+<p>One place where you can see that in action is the Monero cryptocurrency. The system is called <em>RandomX</em>, and whoever wants to earn some Monero by "mining" has to execute programs in the corresponding instruction set as fast as possible, using a virtual RandomX CPU, in the hope that the output of a program run satisfies some condition that is necessary to win the reward for a block.</p>
+
+<p>RandomX knows about 30 instructions. Typically several byte values encode the same instruction; e.g. 0 to 15 all mean a particular variant of addition for a RandomX CPU. Overall every possible byte value from 0 up to 255 is mapped to an instruction.</p>
+
+<p>The reason why it makes sense for Monero to use such an elaborated scheme for mining and go as far as implementing some fancy fantasy CPU can't be explained with a few sentences, but the fundamental goal is easy to state: Nobody shall be able to build machines that mine Monero 1,000 times faster and get an unfair advantage that way.</p>
+
+<hr />
+
+<p>Monero miners were not happy. A few weeks ago a new version of the Monero software had gone into service in a so-called <em>hardfork</em> which included some changes in the RandomX instruction set, and since then people reported frequent random crashes of their machines when they ran mining software. It was all very mysterious because it wasn't that software itself that crashed, but other programs running at the same time, and sometimes even the operating system itself.</p>
+
+<p>Of course it should be altogether impossible that a normal program brings the OS down and forces you to restart the computer, and normally it was, but with those RandomX miners it was somehow different. People with the necessary debugging experience said after analyzing the problem that sooner or later random bytes anywhere in the main memory of the computer changed, seemingly without the mining software being involved in any way, which obviously sounded quite crazy. That mystery had started to make waves even beyond cryptocurrency circles.</p>
+
+<p>My personal involvment in all this started when Matt contacted me for a private chat over IRC. He was one of the Monero devs working on the RandomX code and had implemented the instruction set change.</p>
+
+<p>&lt;matt&gt; I feel really bad about our software crashing people's computers left and right. And think about the bad image that Monero will get. That needs to stop. Maybe you can help<br/>
+&lt;rbrunner&gt; How so? I don't know much about RandomX, or about debugging random computer crashes<br/>
+&lt;matt&gt; Maybe. But you are a fan of "thinking outside the box", and maybe exactly that is needed here. Can I tell you a secret?<br/>
+&lt;rbrunner&gt; I love secrets :)<br/>
+&lt;matt&gt; We told the world that we changed RandomX to discourage people developing dedicated fast hardware for it, just to be on the safe side<br/>
+&lt;rbrunner&gt; Yes, and that makes sense, doesn't it? Keep up a credible threat of financial loss because hardware may become obsolete through our changes<br/>
+&lt;matt&gt; Right. But it's a lie<br/>
+&lt;rbrunner&gt; And the truth is the secret you want to tell me?<br/>
+&lt;matt&gt; Somebody donated a big amount into the general dev fund to get a new instruction implemented according to their spec<br/>
+&lt;rbrunner&gt; "Somebody"? Do you know who it is?<br/>
+&lt;matt&gt; Nope. Anonymous<br/>
+&lt;rbrunner&gt; And you don't know why either I guess?<br/>
+&lt;matt&gt; No, motivation is completely unclear<br/>
+&lt;rbrunner&gt; Crazy. I also want my own private RandomX instruction! Nobody saw any problem with this?<br/>
+&lt;matt&gt; Why? RandomX is called RandomX because basically it calculates random values. Now it calculates some different but still random values.<br/>
+&lt;rbrunner&gt; If Monero miners now help to find the values of physical constants needed to build better atomic bombs? Still no problem?<br/>
+&lt;matt&gt; Well, even if, how would you get those values out of the miners and collect them?<br/>
+&lt;rbrunner&gt; Hmmm. Seems you are right. Still strange. At least the donation was worth it?<br/>
+&lt;matt&gt; You bet.</p>
+
+<hr />
+
+<p>I now had two deep mysteries on my hands, the random crashes and the formula, and no idea whatsoever whether they were somehow connected, and if yes how. But anyway, I started to dig.</p>
+
+<p>The new RandomX instruction calculated subsequent terms described by said formula, something like those endless series in the style of 1/1 + 1/2 + 1/4 + 1/8 + 1/16 + ..., but of course more complicated and elaborate. Where did this come from, and what did it mean?</p>
+
+<p>By lucky coincidence I had read a story about a man from India called Srinivasa Ramanujan a while ago. In the late 1800's and the early 1900's he had filled several notebooks with extraordinary mathematical formulas that later turned out to be correct, opened entire new areas of mathematical work and inspired a vast amount of further research. To this day it was unclear how this largely self-taught man had derived all this, and some of his formulas really looked like out of this world.</p>
+
+<p>I browsed through some of his works on various websites, and was lucky again: I soon found "our" formula, it really was from Srinivasa.</p>
+
+<p>What now? I decided I needed somebody who could tell me more about the man and his discoveries. After some googling I stumbled over a site called <em>mathemagicals.com</em> mentioning him and filled with some pretty wild-looking stuff, but I thought why not talk with somebody maybe a little crazy about two crazy problems, and arranged a video call with the site's author, a guy named Curt.</p>
+
+<p>I asked him what somebody could possibly get out of having terms of such a formula calculated over and over again, without mentioning Monero or revealing which formula exactly. It became an interesting conversation.</p>
+
+<hr />
+
+<p>"Did you ever ask yourself whether numbers exist?" Curt asked me.</p>
+
+<p>"What do you mean? Whether numbers are not only human mathematical inventions, but really exist somewhere, somehow?"</p>
+
+<p>Curt nodded. "Yes. I have a theory that our universe contains a not yet discovered fifth dimension, a mathematical one, where numbers exist and are every bit as real as matter in the known dimensions. How else would so many things be so full of math, like all those laws of physics?"</p>
+
+<p>I was really curious where the hell this would lead. "And in that extra dimension the number 3 lives, say as a green triangle, next to the 5, which is blue?"</p>
+
+<p>"Something like that." Curt smiled. "I believe whole numbers exist there in almost infinite instances. Not only one 3, but many many of them. Almost like atoms, or elementary particles. They are the building blocks of more complicated things, and even beings."</p>
+
+<p>"Beings?"</p>
+
+<p>"Well, yes, some sort of conscious beings. I call them <em>numerators</em>" Curt declared proudly.</p>
+
+<p>It took me half a minute or so to digest this before I could continue: "Alright, interesting theory. But how would you prove it, how could we know about those numerators? You think we can talk to them somehow?"</p>
+
+<p>"They seem to talk to us, sometimes. Take Srinivasa. Do you know what he said about the source of his astonishing mathematical insights?"</p>
+
+<p>"Yeah, he claimed that the goddess of his family revealed them to him. How was it called again?"</p>
+
+<p>"Namagiri Thayar"</p>
+
+<p>I started to understand. "You claim that this was such a numerator from the mathematical dimension, talking to him?"</p>
+
+<p>"Exactly, one especially eager to contact us" Curt confirmed, and continued: "You know, the story you told me, about calculating one of Srinivasa's formulas over and over again, sounds to me as if somebody tries to get the attention of Namagiri Thayar and then establish contact with that being."</p>
+
+<p>"You mean like summoning a ghost?"</p>
+
+<p>Curt nodded.</p>
+
+<p>"I see. But what could that be good for?"</p>
+
+<p>He started to get excited. "Do you have any idea what it would be to talk with such a deeply mathematical, almost god-like being? How many yet unknown and therefore very valuable truths about math you could learn?"</p>
+
+<p>That was an interesting thought, and so I almost forgot to ask an important question: "But what about those computer crashes? Do you have a theory there as well?"</p>
+
+<p>I waited patiently while Curt mulled the question over. Finally he said: "Well ... maybe the numerator tries to interact with the computers, and that's the unfortunate result?"</p>
+
+<hr />
+
+<p>A few days later I had another IRC chat with Matt. I decided to keep quiet about my findings for the time being, just in case.</p>
+
+<p>&lt;matt&gt; Our problems with Monero mining will soon be over.<br/>
+&lt;rbrunner&gt; They will? How come?<br/>
+&lt;matt&gt; We decided to replace that mysteriously problematic new RandomX instruction by one that just innocently multiplies by 3<br/>
+&lt;rbrunner&gt; And there are no more crashes with that?<br/>
+&lt;matt&gt; No. And as much as I would like to learn the secret behind all this, I also voted for the proposal. We must restore order<br/>
+&lt;rbrunner&gt; So there will be another hardfork soon to implement the change?<br/>
+&lt;matt&gt; Yes, as soon as reasonably possible. Testnet will already switch tomorrow.</p>
+
+<hr />
+
+<p>Tomorrow Monero mainnet would fork to a modified-again version of RandomX, and about a million computers scattered over the whole planet would suddenly stop to calculate terms from Srinivasa's formula. If this constituted a signal of any kind it would suddenly vanish. Despite feeling a bit silly about it I decided to take the last good chance and attempt to test Curt's theory myself.</p>
+
+<p>I made the 3 computers in my household run a modified RandomX miner at full speed that I had doctored to execute that "magic" instruction 100% of the time, not only with an average chance of 7/256, in an attempt to maximize the signal, so to say. I went to bed, trying to visualize the formula and think about Srinivasa as long as I could until sleep finally came.</p>
+
+<p>And then I had a dream.</p>
+
+<p>I saw modulo operations on big numbers happening, and despite not knowing much about the subject it was clear to me that I was watching elliptic curve cryptography in action. A bit later I saw how terms of the formula I knew so well now were calculated. And then, like a flash out of the clear blue sky, a sudden insight hit me:</p>
+
+<p>There was something in there that was called <em>isomorphism</em> in math. You could take the task of breaking ECC based encryption, the so far pretty much impossible task of deriving private keys from public keys, and sort of translate it to another mathematical domain where the needed calculations were so many magnitudes fewer and faster as to make the job almost trivial.</p>
+
+<p>And the formula had to do with that other domain. Certainly the unknown person donating for having it included in RandomX had already some suspicions about that fact but was still missing important pieces of the puzzle.</p>
+
+<p>With the prospect of getting to know how to break ECC and then undoubtedly become famous, or rich, or both, I got so excited that I woke up before the dream could progress to the final crucial details.</p>
+
+<p>And the hardfork would happen in a few hours now.</p>
+
+<p>Damn.</p>
+
+<hr />
+
+<p>&lt;matt&gt; Did you hear? It seems somebody solved the mystery of the crashes<br/>
+&lt;rbrunner&gt; Somehow I highly doubt that, but do tell<br/>
+&lt;matt&gt; Do you remember the "row hammer" exploit from a few years back?<br/>
+&lt;rbrunner&gt; Something with trashing bits in memory?<br/>
+&lt;matt&gt; Yes. It turned out that with carefully selected memory access patterns you can stress modern DRAM chips so much that they produce random bit value flips every now and then, and if you are lucky you can poke holes into memory protection that way<br/>
+&lt;rbrunner&gt; Splendid. And the connection to our RandomX troubles?<br/>
+&lt;matt&gt; Somebody found out that a miner executing our ill-fated new instruction fetches memory in a way that leads to effects similar to row hammer<br/>
+&lt;rbrunner&gt; That sounds pretty improbable, if you ask me<br/>
+&lt;matt&gt; Yeah, to be frank I thought so as well. But still better than other theories that seriously claim that witchcraft is involved somehow, lol<br/>
+&lt;rbrunner&gt; Or extra dimensions<br/>
+&lt;matt&gt; What?<br/>
+&lt;rbrunner&gt; Nothing :)</p>
+</body>
+</html>
+
